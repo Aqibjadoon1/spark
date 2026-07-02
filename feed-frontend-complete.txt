@@ -1,0 +1,1394 @@
+================================================================================
+FILE: src/pages/home/Feed.jsx
+================================================================================
+
+import { useState, useEffect, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
+import useAuth from '../../hooks/useAuth';
+import usePosts from '../../hooks/usePosts';
+import { showToast } from '../../redux/actions/uiActions';
+import PostCard from '../../components/cards/PostCard';
+import PostForm from '../../components/forms/PostForm';
+import Pagination from '../../components/globals/Pagination';
+import Skeleton from '../../components/globals/Skeleton';
+import SelectInput from '../../components/inputs/SelectInput';
+import Avatar from '../../components/globals/Avatar';
+
+const POSTS_PER_PAGE = 10;
+
+const sortOptions = [
+  { value: 'latest', label: 'Latest' },
+  { value: 'most_reacted', label: 'Most Reacted' },
+  { value: 'most_viewed', label: 'Most Viewed' },
+];
+
+const categoryOptions = [
+  { value: '', label: 'All Categories' },
+  { value: 'general', label: 'General' },
+  { value: 'technology', label: 'Technology' },
+  { value: 'lifestyle', label: 'Lifestyle' },
+  { value: 'entertainment', label: 'Entertainment' },
+  { value: 'sports', label: 'Sports' },
+];
+
+const EmptyState = ({ title, description, actionLabel, onAction }) => (
+  <div className="feed-empty">
+    <div className="feed-empty-icon">
+      <svg viewBox="0 0 24 24" fill="none" width="32" height="32">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="url(#empty-grad)" strokeWidth="1.5" fill="none"/>
+        <defs>
+          <linearGradient id="empty-grad" x1="2" y1="2" x2="22" y2="22">
+            <stop offset="0%" stopColor="#A15CFF"/>
+            <stop offset="100%" stopColor="#FF3C9D"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <h3 className="feed-empty-title">{title}</h3>
+    <p className="feed-empty-desc">{description}</p>
+    {actionLabel && onAction && (
+      <button onClick={onAction} className="btn-primary">{actionLabel}</button>
+    )}
+  </div>
+);
+
+const Feed = () => {
+  const dispatch = useDispatch();
+  const { user } = useAuth();
+  const { posts, loading, error, createPost, deletePost, reactToPost } = usePosts();
+
+  const [category, setCategory] = useState('');
+  const [sortBy, setSortBy] = useState('latest');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [creating, setCreating] = useState(false);
+
+  useEffect(() => {
+    document.title = 'Feed | Spark';
+  }, []);
+
+  useEffect(() => {
+    if (error) {
+      dispatch(showToast(error, 'error'));
+    }
+  }, [error, dispatch]);
+
+  const filteredPosts = useMemo(() => {
+    let result = [...posts];
+    if (category) {
+      result = result.filter((p) => p.category === category);
+    }
+    switch (sortBy) {
+      case 'most_reacted':
+        result.sort((a, b) => (b.reactionCount || 0) - (a.reactionCount || 0));
+        break;
+      case 'most_viewed':
+        result.sort((a, b) => (b.views || 0) - (a.views || 0));
+        break;
+      default:
+        result.sort((a, b) => {
+          const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+          const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+          return bTime - aTime;
+        });
+    }
+    return result;
+  }, [posts, category, sortBy]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / POSTS_PER_PAGE));
+  const paginatedPosts = filteredPosts.slice(
+    (currentPage - 1) * POSTS_PER_PAGE,
+    currentPage * POSTS_PER_PAGE,
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [category, sortBy]);
+
+  const handleCreatePost = async (data) => {
+    setCreating(true);
+    try {
+      await createPost({ ...data, authorId: user?.uid, authorName: user?.displayName || user?.name, authorPhoto: user?.photoURL });
+      dispatch(showToast('Post created!', 'success'));
+    } catch (err) {
+      dispatch(showToast(err.message, 'error'));
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deletePost(id);
+      dispatch(showToast('Post deleted', 'success'));
+    } catch (err) {
+      dispatch(showToast(err.message, 'error'));
+    }
+  };
+
+  const handleReact = async (id, emoji) => {
+    try {
+      await reactToPost(id, emoji);
+    } catch (err) {
+      dispatch(showToast(err.message, 'error'));
+    }
+  };
+
+  return (
+    <div className="feed">
+      <div className="feed-heading">
+        <h1 className="feed-title">Feed</h1>
+        <p className="feed-subtitle">See what's happening in your community</p>
+      </div>
+
+      <div className="feed-create-card">
+        <div className="feed-create-header">
+          <Avatar src={user?.photoURL} name={user?.displayName || user?.name} size="md" />
+          <span className="feed-create-greeting">What's on your mind, {user?.displayName || user?.name?.split(' ')[0] || 'there'}?</span>
+        </div>
+        <PostForm onSubmit={handleCreatePost} isLoading={creating} />
+      </div>
+
+      <div className="feed-filters">
+        <SelectInput
+          options={categoryOptions}
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          placeholder="All Categories"
+        />
+        <SelectInput
+          options={sortOptions}
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+        />
+      </div>
+
+      {loading && !creating ? (
+        <div className="feed-skeleton">
+          <Skeleton variant="post" count={3} />
+        </div>
+      ) : paginatedPosts.length === 0 ? (
+        <EmptyState
+          title="No posts yet"
+          description={category ? 'No posts in this category. Try a different filter.' : 'Be the first to start the conversation.'}
+          actionLabel="Create a Post"
+          onAction={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        />
+      ) : (
+        <div className="feed-timeline">
+          {paginatedPosts.map((post) => (
+            <div className="feed-post-wrapper" key={post.id}>
+              <PostCard
+                post={post}
+                onReact={handleReact}
+                onDelete={handleDelete}
+                currentUserId={user?.uid}
+                onComment={(id) => window.location.href = `/post/${id}`}
+              />
+            </div>
+          ))}
+
+          {totalPages > 1 && (
+            <div className="feed-pagination">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Feed;
+
+
+================================================================================
+FILE: src/components/forms/PostForm.jsx
+================================================================================
+
+import { useState, useEffect } from 'react';
+
+const PostForm = ({ onSubmit, initialData, isLoading = false }) => {
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [tagInput, setTagInput] = useState('');
+  const [tags, setTags] = useState([]);
+  const [category, setCategory] = useState('');
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (initialData) {
+      setTitle(initialData.title || '');
+      setContent(initialData.content || '');
+      setTags(initialData.tags || []);
+      setCategory(initialData.category || '');
+    }
+  }, [initialData]);
+
+  const addTag = (e) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const trimmed = tagInput.trim().replace(/,/g, '');
+      if (trimmed && !tags.includes(trimmed)) {
+        setTags((prev) => [...prev, trimmed]);
+      }
+      setTagInput('');
+    }
+  };
+
+  const removeTag = (tag) => {
+    setTags((prev) => prev.filter((t) => t !== tag));
+  };
+
+  const validate = () => {
+    const errs = {};
+    if (!title.trim()) errs.title = 'Title is required';
+    if (!content.trim()) errs.content = 'Content is required';
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  return (
+    <form onSubmit={(e) => e.preventDefault()} className="card-container space-y-5" noValidate>
+      <div>
+        <label htmlFor="post-title" className="block text-sm font-medium text-text-muted mb-2">Title *</label>
+        <input
+          id="post-title"
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full h-12 px-4 bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-xl text-sm text-[#09090B] dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-lime/50 focus:ring-2 focus:ring-lime/20 transition-all"
+          placeholder="What's on your mind?"
+          aria-label="Post title"
+        />
+        {errors.title && <p className="mt-1.5 text-xs text-red">{errors.title}</p>}
+      </div>
+
+      <div>
+        <label htmlFor="post-content" className="block text-sm font-medium text-text-muted mb-2">Content *</label>
+        <textarea
+          id="post-content"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          rows={5}
+          className="w-full min-h-[120px] px-4 py-3 bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-xl text-sm text-[#09090B] dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-lime/50 focus:ring-2 focus:ring-lime/20 transition-all resize-y"
+          placeholder="Share your thoughts..."
+          aria-label="Post content"
+        />
+        {errors.content && <p className="mt-1.5 text-xs text-red">{errors.content}</p>}
+      </div>
+
+      <div>
+        <label htmlFor="post-tags" className="block text-sm font-medium text-text-muted mb-2">Tags</label>
+        <div className="flex flex-wrap gap-2 mb-2">
+          {tags.map((tag) => (
+            <span key={tag} className="inline-flex items-center gap-1 px-3 py-1 bg-lime/10 text-lime text-xs rounded-full border border-lime/20">
+              #{tag}
+              <button type="button" onClick={() => removeTag(tag)} className="hover:text-[#09090B] dark:hover:text-white transition-colors" aria-label={`Remove tag ${tag}`}>
+                <svg className="w-3 h-3" viewBox="0 0 12 12" fill="none">
+                  <path d="M9 3L3 9M3 3l6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </button>
+            </span>
+          ))}
+        </div>
+        <input
+          id="post-tags"
+          type="text"
+          value={tagInput}
+          onChange={(e) => setTagInput(e.target.value)}
+          onKeyDown={addTag}
+          className="w-full h-10 px-4 bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-xl text-sm text-[#09090B] dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-lime/50 focus:ring-2 focus:ring-lime/20 transition-all"
+          placeholder="Type a tag and press Enter"
+          aria-label="Add tags"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="post-category" className="block text-sm font-medium text-text-muted mb-2">Category</label>
+        <select
+          id="post-category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="w-full h-12 px-4 bg-white dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-xl text-sm text-[#09090B] dark:text-white focus:outline-none focus:border-lime/50 focus:ring-2 focus:ring-lime/20 transition-all appearance-none cursor-pointer"
+          aria-label="Select category"
+        >
+          <option value="">Select a category</option>
+          <option value="general">General</option>
+          <option value="technology">Technology</option>
+          <option value="lifestyle">Lifestyle</option>
+          <option value="entertainment">Entertainment</option>
+          <option value="sports">Sports</option>
+        </select>
+      </div>
+
+      <div className="flex items-center justify-between pt-3 mt-4 border-t border-gray-200 dark:border-dark-border">
+        <button
+          type="button"
+          className="btn-ghost inline-flex items-center gap-2 text-sm px-4 py-2"
+          aria-label="Add image"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none">
+            <path d="M2.5 15.5L6.5 11.5L9.5 14.5L13.5 10.5L17.5 15.5M13.5 8.5C12.6716 8.5 12 7.82843 12 7C12 6.17157 12.6716 5.5 13.5 5.5C14.3284 5.5 15 6.17157 15 7C15 7.82843 14.3284 8.5 13.5 8.5ZM4.5 2.5H15.5C16.6046 2.5 17.5 3.39543 17.5 4.5V15.5C17.5 16.6046 16.6046 17.5 15.5 17.5H4.5C3.39543 17.5 2.5 16.6046 2.5 15.5V4.5C2.5 3.39543 3.39543 2.5 4.5 2.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Image
+        </button>
+        <button
+          type="button"
+          onClick={async () => {
+            if (!content.trim()) return;
+            if (!validate() || isLoading) return;
+            await onSubmit?.({ title: title.trim(), content: content.trim(), tags, category });
+          }}
+          disabled={isLoading}
+          className="btn-primary"
+        >
+          {isLoading && (
+            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+          )}
+          {initialData ? 'Update Post' : 'Create Post'}
+        </button>
+      </div>
+    </form>
+  );
+};
+
+export default PostForm;
+
+
+================================================================================
+FILE: src/components/cards/PostCard.jsx
+================================================================================
+
+import { memo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { timeAgo } from '../../utils/timestampUtils';
+import { truncateText, formatNumber } from '../../utils/formatUtils';
+import Avatar from '../globals/Avatar';
+
+const PostCard = memo(({ post, onReact, onComment, onDelete, onEdit, currentUserId }) => {
+  const navigate = useNavigate();
+
+  if (!post) return null;
+
+  const {
+    id,
+    authorId,
+    authorName,
+    authorPhoto,
+    title,
+    content,
+    tags = [],
+    reactions = {},
+    commentsCount = 0,
+    reactionCount = 0,
+    createdAt,
+  } = post;
+
+  const isAuthor = currentUserId && currentUserId === authorId;
+  const reactionEmojis = ['❤️', '🔥', '👍'];
+
+  const handleClick = (e) => {
+    if (e.target.closest('button')) return;
+    navigate(`/post/${id}`);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      navigate(`/post/${id}`);
+    }
+  };
+
+  return (
+    <article
+      className="card-container cursor-pointer"
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="article"
+      aria-label={`Post by ${authorName}: ${title}`}
+    >
+      <div className="flex items-center gap-3 mb-4">
+        <Avatar src={authorPhoto} name={authorName} size="md" />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold">{authorName}</p>
+          <p className="text-xs text-text-muted">{timeAgo(createdAt)}</p>
+        </div>
+      </div>
+
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      <p className="text-sm text-text-gray leading-relaxed mb-4">{truncateText(content, 200)}</p>
+
+      {tags.length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {tags.map((tag) => (
+            <span key={tag} className="px-3 py-1 bg-lime/10 text-lime text-xs rounded-full border border-lime/20">
+              #{tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-dark-border">
+        <div className="flex items-center gap-1">
+          {reactionEmojis.map((emoji) => (
+            <button
+              key={emoji}
+              onClick={(e) => { e.stopPropagation(); onReact?.(id, emoji); }}
+              className="flex items-center gap-1 px-2.5 py-1.5 text-sm rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+              aria-label={`React with ${emoji}`}
+            >
+              <span className="text-base">{emoji}</span>
+              <span className="text-gray-500 dark:text-text-muted text-xs">{formatNumber(reactions[emoji] || 0)}</span>
+            </button>
+          ))}
+          <button
+            onClick={(e) => { e.stopPropagation(); onComment?.(id); }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-500 dark:text-text-muted rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+            aria-label={`${commentsCount} comments`}
+          >
+            💬 <span>{formatNumber(commentsCount)}</span>
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500 dark:text-text-muted">{formatNumber(reactionCount)} reactions</span>
+          {isAuthor && (
+            <div className="flex gap-1">
+              <button
+                onClick={(e) => { e.stopPropagation(); onEdit?.(post); }}
+                className="p-1.5 text-gray-500 dark:text-text-muted hover:text-lime rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                aria-label="Edit post"
+              >
+                ✏️
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onDelete?.(id); }}
+                className="p-1.5 text-gray-500 dark:text-text-muted hover:text-red rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                aria-label="Delete post"
+              >
+                🗑️
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </article>
+  );
+});
+
+export default PostCard;
+
+
+================================================================================
+FILE: src/styles/index.css  (FEED + CREATE POST + POST CARD SECTIONS ONLY)
+================================================================================
+
+/* ====== FEED PAGE ====== */
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.feed-heading {
+  margin-bottom: 4px;
+}
+
+.feed-title {
+  font-size: 28px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.90);
+  font-family: 'Rajdhani', sans-serif;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+}
+
+.feed-subtitle {
+  font-size: 14px;
+  color: rgba(255,255,255,0.40);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+.feed-create-card {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.feed-create-card:hover {
+  box-shadow: 0 24px 60px rgba(123,77,255,0.12);
+}
+
+.feed-create-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.feed-create-greeting {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+}
+
+.feed-filters {
+  display: flex;
+  gap: 12px;
+}
+
+.feed-filters select,
+.feed-filters .select-input {
+  flex: 1;
+}
+
+.feed-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Empty State */
+.feed-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px;
+  gap: 16px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+}
+
+.feed-empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: rgba(161,92,255,0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.feed-empty-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+}
+
+.feed-empty-desc {
+  font-size: 14px;
+  color: rgba(255,255,255,0.40);
+  max-width: 360px;
+  line-height: 1.5;
+}
+
+/* Timeline */
+.feed-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.feed-post-wrapper {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.feed-post-wrapper:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 24px 60px rgba(123,77,255,0.12);
+}
+
+.feed-post-wrapper .post-card {
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+}
+
+.feed-post-wrapper .post-card:hover {
+  box-shadow: none;
+}
+
+.feed-pagination {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+/* ====== POST CARDS ====== */
+.post-card {
+  background: #0F0F18;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.post-card:hover {
+  box-shadow: 0 8px 24px rgba(123,77,255,0.15);
+}
+.post-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px 16px 12px;
+}
+.post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #7B4DFF;
+}
+.post-author-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  cursor: pointer;
+}
+.post-author-name:hover {
+  color: #A15CFF;
+}
+.post-timestamp {
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 1px;
+}
+.post-more-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255,255,255,0.35);
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+}
+.post-more-btn:hover {
+  color: rgba(255,255,255,0.55);
+}
+.post-body {
+  padding: 0 16px 12px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.70);
+  line-height: 1.65;
+}
+.post-body a {
+  color: #A15CFF;
+  font-weight: 600;
+}
+.post-body a:hover {
+  text-decoration: underline;
+}
+.post-link-preview {
+  margin: 0 16px 12px;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.post-link-preview:hover {
+  border-color: #A15CFF;
+}
+.post-link-preview-image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  background: linear-gradient(135deg, #7B4DFF, #FF3C9D);
+}
+.post-link-preview-body {
+  padding: 10px 12px;
+}
+.post-link-preview-source {
+  font-size: 11px;
+  color: #A15CFF;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.post-link-preview-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  line-height: 1.35;
+}
+.post-link-preview-url {
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 4px;
+}
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 16px 12px;
+}
+.post-tag {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  font-family: 'Nunito', sans-serif;
+  transition: opacity 0.15s;
+}
+.post-tag:hover {
+  opacity: 0.85;
+}
+.post-tag.purple {
+  background: rgba(161,92,255,0.15);
+  color: #A15CFF;
+}
+.post-tag.teal {
+  background: rgba(255,60,157,0.15);
+  color: #FF3C9D;
+}
+.post-tag.violet {
+  background: rgba(145,70,255,0.15);
+  color: #9146FF;
+}
+.post-tag.default {
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.55);
+}
+.post-reactions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+}
+.post-reaction-count {
+  font-size: 13px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 600;
+}
+.post-meta-counts {
+  margin-left: auto;
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  align-items: center;
+}
+.post-action-bar {
+  display: flex;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.post-action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.35);
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.15s;
+  border-radius: 0;
+}
+.post-action-btn:hover {
+  background: rgba(255,255,255,0.03);
+  color: #A15CFF;
+}
+.post-action-btn svg {
+  width: 16px;
+  height: 16px;
+}
+.post-action-btn.active {
+  color: #A15CFF;
+}
+
+/* ====== BUTTONS ====== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  transition: all 0.15s;
+  border-radius: 8px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #7B4DFF, #FF3FA7);
+  color: #FFFFFF;
+  padding: 10px 20px;
+  font-size: 14px;
+  box-shadow: 0 10px 35px rgba(255,70,180,0.25);
+}
+.btn-primary:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: scale(0.97);
+}
+.btn-primary:disabled {
+  background: rgba(255,255,255,0.08);
+  color: rgba(255,255,255,0.35);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.btn-ghost {
+  background: transparent;
+  color: rgba(255,255,255,0.55);
+  border: 1.5px solid rgba(255,255,255,0.10);
+  padding: 8px 16px;
+  font-size: 13px;
+}
+.btn-ghost:hover {
+  border-color: #A15CFF;
+  color: #A15CFF;
+}
+
+/* ====== POST CREATE FORM ====== */
+.post-create-form {
+  background: #0F0F18;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.post-create-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.post-create-title-input {
+  flex: 1;
+  background: #1A1A25;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+  font-family: 'Nunito', sans-serif;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.post-create-title-input::placeholder {
+  color: rgba(255,255,255,0.35);
+  font-weight: 400;
+}
+.post-create-title-input:focus {
+  border-color: #7B4DFF;
+}
+.post-create-textarea {
+  width: 100%;
+  background: #1A1A25;
+  border: 1.5px solid transparent;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.85);
+  font-family: 'Nunito', sans-serif;
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.6;
+  transition: border-color 0.15s;
+}
+.post-create-textarea::placeholder {
+  color: rgba(255,255,255,0.35);
+}
+.post-create-textarea:focus {
+  border-color: #7B4DFF;
+}
+.post-create-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 12px;
+}
+.post-create-tools {
+  display: flex;
+  gap: 4px;
+}
+
+
+================================================================================
+FILE: src/styles/index.css  (UNIFIED LAYOUT + SIDEBAR + RESPONSIVE)
+================================================================================
+
+/* ====== UNIFIED LAYOUT ====== */
+.unified-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(700px, 800px) 340px;
+  max-width: 1600px;
+  margin: 0 auto;
+  min-height: calc(100vh - 64px);
+  background: #090914;
+  gap: 0;
+}
+
+.unified-content {
+  padding: 24px;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.unified-right {
+  padding: 24px 24px 24px 0;
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+/* ====== LEFT SIDEBAR ====== */
+.left-sidebar {
+  background: #0B0B12;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  position: sticky;
+  top: 64px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+.left-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+
+.left-sidebar-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(161,92,255,0.20), rgba(255,60,157,0.20));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #A15CFF;
+  flex-shrink: 0;
+}
+
+.left-sidebar-brand-text {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  background: linear-gradient(135deg, #A15CFF, #FF3C9D);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.left-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 12px;
+  flex: 1;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: rgba(255,255,255,0.55);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: 'Nunito', sans-serif;
+  width: 100%;
+  text-align: left;
+  transition: all 0.15s;
+}
+.sidebar-nav-item:hover {
+  background: rgba(255,255,255,0.03);
+  color: rgba(255,255,255,0.85);
+}
+.sidebar-nav-item.active {
+  background: rgba(161,92,255,0.10);
+  color: #A15CFF;
+}
+.sidebar-nav-item svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.sidebar-nav-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-nav-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.left-sidebar-spacer {
+  flex: 1;
+}
+
+.left-sidebar-footer {
+  padding: 8px 12px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.sidebar-logout {
+  color: rgba(255,107,107,0.60) !important;
+}
+.sidebar-logout:hover {
+  color: #FF6B6B !important;
+  background: rgba(255,107,107,0.08) !important;
+}
+
+/* ====== RIGHT SIDEBAR WIDGETS ====== */
+.right-sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rs-card {
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+}
+
+.rs-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.rs-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.70);
+  letter-spacing: 0.02em;
+}
+
+.rs-card-more {
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.35);
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: color 0.15s;
+}
+
+.rs-card-more:hover {
+  color: #A15CFF;
+}
+
+.rs-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rs-tag {
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.70);
+  background: rgba(161,92,255,0.10);
+  border: 1px solid rgba(161,92,255,0.15);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: 'Nunito', sans-serif;
+}
+
+.rs-tag:hover {
+  background: rgba(161,92,255,0.18);
+  border-color: rgba(161,92,255,0.30);
+}
+
+.rs-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rs-category-btn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.15s;
+}
+
+.rs-category-btn:hover {
+  background: rgba(161,92,255,0.10);
+  color: #A15CFF;
+  border-color: rgba(161,92,255,0.20);
+}
+
+.rs-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.rs-stat {
+  text-align: center;
+  padding: 8px 4px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.02);
+}
+
+.rs-stat-value {
+  display: block;
+  font-size: 20px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.85);
+  font-family: 'Rajdhani', sans-serif;
+  line-height: 1.1;
+}
+
+.rs-stat-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.35);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
+
+.rs-user-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.rs-user-row + .rs-user-row {
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.rs-user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7B4DFF, #FF3FA7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #FFFFFF;
+  flex-shrink: 0;
+}
+
+.rs-user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.rs-user-name {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.70);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rs-user-handle {
+  display: block;
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 1px;
+}
+
+.rs-follow-btn {
+  padding: 5px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #FFFFFF;
+  background: linear-gradient(135deg, #7B4DFF, #FF3FA7);
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.rs-follow-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 1200px) {
+  .unified-layout { grid-template-columns: 280px 1fr; }
+  .unified-right { display: none; }
+  .profile-content-grid { grid-template-columns: 200px 1fr; }
+  .profile-right-col { display: none; }
+  .dashboard-stat-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .unified-layout { grid-template-columns: 1fr; }
+  .left-sidebar { display: none; }
+  .unified-right { display: none; }
+  .unified-content { padding: 16px; }
+  .profile-content-grid { grid-template-columns: 1fr; }
+  .profile-left-col { display: none; }
+  .dashboard-shell { grid-template-columns: 1fr; }
+  .dashboard-sidebar { display: none; }
+  .feed-create-card { padding: 16px; }
+  .feed-filters { flex-direction: column; }
+  .bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; right: 0; background: #0B0B12; border-top: 1px solid rgba(255,255,255,0.06); padding: 8px 0 max(8px, env(safe-area-inset-bottom)); z-index: 99; justify-content: space-around; }
+  .bottom-nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; color: rgba(255,255,255,0.40); font-size: 10px; font-weight: 600; cursor: pointer; background: none; border: none; font-family: 'Nunito', sans-serif; padding: 4px 16px; }
+  .bottom-nav-item.active { color: #A15CFF; }
+  .bottom-nav-item svg { width: 20px; height: 20px; }
+}
+@media (min-width: 769px) { .bottom-nav { display: none; } }
+
+
+================================================================================
+FILE: src/components/feed/FeedRightSidebar.jsx
+================================================================================
+
+const trendingTags = ['#technology', '#gaming', '#design', '#music', '#ai', '#photography', '#fitness', '#travel'];
+const categories = ['General', 'Technology', 'Lifestyle', 'Entertainment', 'Sports'];
+const suggestedUsers = [
+  { name: 'Alex Rivera', handle: '@alexrivera', avatar: 'AR' },
+  { name: 'Sarah Chen', handle: '@sarahchen', avatar: 'SC' },
+  { name: 'Marcus Johnson', handle: '@marcusj', avatar: 'MJ' },
+];
+
+const FeedRightSidebar = () => (
+  <div className="right-sidebar-inner">
+    <div className="rs-card">
+      <div className="rs-card-header">
+        <span className="rs-card-title">Trending Tags</span>
+        <button className="rs-card-more">See all</button>
+      </div>
+      <div className="rs-tags">
+        {trendingTags.map((tag) => (
+          <span key={tag} className="rs-tag">#{tag.replace('#', '')}</span>
+        ))}
+      </div>
+    </div>
+
+    <div className="rs-card">
+      <div className="rs-card-header">
+        <span className="rs-card-title">Categories</span>
+      </div>
+      <div className="rs-categories">
+        {categories.map((cat) => (
+          <button key={cat} className="rs-category-btn">{cat}</button>
+        ))}
+      </div>
+    </div>
+
+    <div className="rs-card">
+      <div className="rs-card-header">
+        <span className="rs-card-title">Community Stats</span>
+      </div>
+      <div className="rs-stats">
+        <div className="rs-stat">
+          <span className="rs-stat-value">1,284</span>
+          <span className="rs-stat-label">Posts</span>
+        </div>
+        <div className="rs-stat">
+          <span className="rs-stat-value">342</span>
+          <span className="rs-stat-label">Members</span>
+        </div>
+        <div className="rs-stat">
+          <span className="rs-stat-value">23</span>
+          <span className="rs-stat-label">Online</span>
+        </div>
+      </div>
+    </div>
+
+    <div className="rs-card">
+      <div className="rs-card-header">
+        <span className="rs-card-title">Who to Follow</span>
+      </div>
+      {suggestedUsers.map((user) => (
+        <div key={user.handle} className="rs-user-row">
+          <div className="rs-user-avatar">{user.avatar}</div>
+          <div className="rs-user-info">
+            <span className="rs-user-name">{user.name}</span>
+            <span className="rs-user-handle">{user.handle}</span>
+          </div>
+          <button className="rs-follow-btn">Follow</button>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+export default FeedRightSidebar;
