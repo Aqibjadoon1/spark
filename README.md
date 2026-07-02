@@ -1,4 +1,4 @@
-# Nexus — Social Network
+# SPARK — Social Network
 
 A production-quality social networking web application built with React 19 + Firebase.
 
