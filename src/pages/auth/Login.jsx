@@ -138,7 +138,8 @@ const Login = () => {
         {googleLoading ? 'Signing in...' : 'Sign in with Google'}
       </button>
 
-      <div className="auth-footer">
+      <div className="auth-footer" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+        <button type="button" onClick={goRegister} style={{ background: 'linear-gradient(135deg, #7B4DFF, #FF3FA7)', color: '#FFF', border: 'none', borderRadius: 14, padding: '10px 28px', fontSize: 13, fontWeight: 700, fontFamily: "'Inter', sans-serif", cursor: 'pointer', boxShadow: '0 4px 15px var(--shadow-glow-pink)', transition: 'all 0.3s ease', display: 'inline-block' }}>Sign up</button>
         <span className="auth-footer-text">
           Don&apos;t have an account?{' '}
           <button type="button" className="auth-footer-link" onClick={goRegister}>Sign up</button>
