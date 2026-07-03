@@ -34,11 +34,21 @@ export const uploadProfileImage = async (uid, file) => {
  * @param {File} file
  * @returns {Promise<string>} Download URL
  */
+const withTimeout = (promise, ms) => {
+  let timer;
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      timer = setTimeout(() => reject(new Error('Upload timed out')), ms);
+    }),
+  ]).finally(() => clearTimeout(timer));
+};
+
 export const uploadPostImage = async (postId, file) => {
   try {
     const storageRef = ref(storage, `posts/${postId}/image`);
-    await uploadBytes(storageRef, file);
-    const downloadURL = await getDownloadURL(storageRef);
+    await withTimeout(uploadBytes(storageRef, file), 10000);
+    const downloadURL = await withTimeout(getDownloadURL(storageRef), 10000);
     return downloadURL;
   } catch (error) {
     throw new Error(`Failed to upload post image: ${error.message}`);

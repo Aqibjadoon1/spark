@@ -103,7 +103,7 @@ const EditProfile = () => {
 
   return (
     <div className="dashboard-content" style={{ maxWidth: '42rem', margin: '0 auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
         <div className="section-header">
           <h1>Edit Profile</h1>
           <p>Update your personal information</p>
@@ -111,27 +111,31 @@ const EditProfile = () => {
         <button className="btn btn-ghost" onClick={() => navigate(-1)}>Cancel</button>
       </div>
 
-      <div className="panel-card">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '2rem' }}>
-          <div style={{ position: 'relative', cursor: 'pointer', flexShrink: 0 }} onClick={() => fileInputRef.current?.click()}>
-            <Avatar
-              src={photoPreview || authUser.photoURL}
-              name={authUser.displayName || authUser.email}
-              size="lg"
-            />
-            <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s' }}              onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-              onMouseLeave={(e) => e.currentTarget.style.opacity = '0'}>
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
-              </svg>
+      <div className="cp-card">
+        <div className="cp-header">
+          <div className="cp-header-top">
+            <div style={{ position: 'relative', cursor: 'pointer', flexShrink: 0 }} onClick={() => fileInputRef.current?.click()}>
+              <Avatar
+                src={photoPreview || authUser.photoURL}
+                name={authUser.displayName || authUser.email}
+                size="md"
+              />
+              <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '0'}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                </svg>
+              </div>
             </div>
-          </div>
-          <div>
-            <p style={{ fontSize: '1.125rem', fontWeight: '600' }}>{authUser.displayName || 'Your Name'}</p>
-            <button className="btn btn-ghost btn-sm" onClick={() => fileInputRef.current?.click()} style={{ padding: 0, marginTop: '0.25rem' }}>
-              Change photo
-            </button>
+            <div>
+              <h2 className="cp-title">Edit Profile</h2>
+              <p className="cp-subtitle">{authUser.displayName || 'Your Name'}</p>
+              <button className="btn btn-ghost btn-sm" onClick={() => fileInputRef.current?.click()} style={{ padding: 0, marginTop: '0.25rem', fontSize: '0.75rem' }}>
+                Change photo
+              </button>
+            </div>
           </div>
           <input
             ref={fileInputRef}

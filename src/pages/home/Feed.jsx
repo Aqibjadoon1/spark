@@ -5,7 +5,7 @@ import usePosts from '../../hooks/usePosts';
 import { showToast } from '../../redux/actions/uiActions';
 import PostCard from '../../components/cards/PostCard';
 import PostForm from '../../components/forms/PostForm';
-import { uploadPostImage, getFileDownloadURL, ref, storage } from '../../services/storageService';
+import { uploadPostImage } from '../../services/storageService';
 import Skeleton from '../../components/globals/Skeleton';
 
 const dummyPosts = [
@@ -64,12 +64,9 @@ const Feed = () => {
       });
       const postId = post.id;
       if (data.image) {
-        try {
-          const image = await uploadPostImage(postId, data.image);
-          await updatePost(postId, { image });
-        } catch {
-          dispatch(showToast('Post created, but image upload failed', 'warning'));
-        }
+        uploadPostImage(postId, data.image)
+          .then((image) => updatePost(postId, { image }))
+          .catch(() => dispatch(showToast('Image upload failed', 'warning')));
       }
       dispatch(showToast('Post created!', 'success'));
     } catch (err) {
