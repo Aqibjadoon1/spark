@@ -190,7 +190,7 @@ const Register = () => {
         {googleLoading ? 'Signing up...' : 'Sign up with Google'}
       </button>
 
-      <div className="auth-footer" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 10 }}>
+      <div className="auth-footer" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
         <button type="button" onClick={goLogin} style={{ background: 'linear-gradient(135deg, #7B4DFF, #FF3FA7)', color: '#FFF', border: 'none', borderRadius: 14, padding: '10px 28px', fontSize: 13, fontWeight: 700, fontFamily: "'Inter', sans-serif", cursor: 'pointer', boxShadow: '0 4px 15px var(--shadow-glow-pink)', transition: 'all 0.3s ease', display: 'inline-block' }}>Sign in</button>
         <span className="auth-footer-text">
           Already have an account?{' '}
