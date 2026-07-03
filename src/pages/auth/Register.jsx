@@ -190,7 +190,10 @@ const Register = () => {
         {googleLoading ? 'Signing up...' : 'Sign up with Google'}
       </button>
 
-      <div className="auth-footer">
+      <div className="auth-footer" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+        <button type="button" className="auth-submit-btn" onClick={goLogin} style={{ height: 48, fontSize: 14 }}>
+          Sign In
+        </button>
         <span className="auth-footer-text">
           Already have an account?{' '}
           <button type="button" className="auth-footer-link" onClick={goLogin}>Sign in</button>
