@@ -45,7 +45,7 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <div>
+    <div style={{ overflowX: 'hidden' }}>
       <HeroSection />
 
       <section className="lp-about">

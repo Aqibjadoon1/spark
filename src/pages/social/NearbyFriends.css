@@ -1,14 +1,23 @@
+.nf-page { width: 100%; max-width: 100%; padding: 0; }
+
 .nf-wrapper {
   display: flex;
-  flex-direction: column;
   gap: 1.5rem;
+  min-height: calc(100vh - 140px);
+}
+
+.nf-map-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .nf-map-container {
   position: relative;
   width: 100%;
-  height: 400px;
-  min-height: 400px;
+  height: 100%;
+  min-height: 500px;
   border-radius: 1rem;
   overflow: hidden;
   border: 1px solid var(--border-medium);
@@ -49,7 +58,7 @@
 }
 
 .nf-user-marker.self {
-  background: #A15CFF;
+  background: var(--color-primary-light);
   width: 40px;
   height: 40px;
   border-width: 3px;
@@ -83,9 +92,121 @@
   opacity: 0.85;
 }
 
+.nf-friend-sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  max-height: calc(100vh - 140px);
+}
+
+.nf-friend-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-light);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nf-friend-count {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.nf-friend-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nf-friend-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--bg-surface-raised);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  transition: border-color 0.15s;
+  cursor: pointer;
+}
+
+.nf-friend-card:hover {
+  border-color: var(--border-strong);
+}
+
+.nf-friend-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--color-primary-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+}
+
+.nf-friend-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.nf-friend-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nf-friend-distance {
+  font-size: 12px;
+  color: var(--color-text-muted-aa);
+  margin-top: 2px;
+}
+
+.nf-friend-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 1024px) {
+  .nf-wrapper {
+    flex-direction: column;
+    min-height: auto;
+  }
+  .nf-map-col { min-height: 400px; }
+  .nf-map-container { min-height: 400px; flex: none; height: 400px; }
+  .nf-friend-sidebar { width: 100%; max-height: none; }
+  .nf-friend-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .nf-map-container {
     height: 280px;
+    min-height: 280px;
     border-radius: 0.75rem;
   }
+  .nf-map-col { min-height: 280px; }
 }

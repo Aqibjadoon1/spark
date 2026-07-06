@@ -48,6 +48,7 @@ const NearbyFriends = () => {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const markersLayer = useRef(null);
+  const resizeObsRef = useRef(null);
 
   useEffect(() => {
     document.title = 'Nearby Friends - Elite Social';
@@ -132,10 +133,16 @@ const NearbyFriends = () => {
       maxZoom: 19,
     }).addTo(map);
     mapInstance.current = map;
-    map.invalidateSize();
+    setTimeout(() => map.invalidateSize(), 50);
     setMapInit(true);
 
+    resizeObsRef.current = new ResizeObserver(() => {
+      if (mapInstance.current) mapInstance.current.invalidateSize();
+    });
+    resizeObsRef.current.observe(mapRef.current);
+
     return () => {
+      if (resizeObsRef.current) resizeObsRef.current.disconnect();
       map.remove();
       mapInstance.current = null;
     };
@@ -203,6 +210,8 @@ const NearbyFriends = () => {
       if (lat != null && lng != null) points.push(L.latLng(lat, lng));
     });
 
+    setTimeout(() => { if (mapInstance.current) mapInstance.current.invalidateSize(); }, 100);
+
     if (points.length > 1) {
       map.fitBounds(points, { padding: [50, 50], maxZoom: 15 });
     }
@@ -212,7 +221,7 @@ const NearbyFriends = () => {
     geoError && (geoError.includes('denied') || geoError.includes('permission') || geoError.includes('not allowed'));
 
   return (
-    <div className="dashboard-content animate-in" style={{ maxWidth: '72rem', margin: '0 auto' }}>
+    <div className="dashboard-content animate-in nf-page">
       <div className="section-header" style={{ marginBottom: '1.5rem' }}>
         <h1>Nearby Friends</h1>
         <p style={{ marginBottom: '0.75rem' }}>Discover people around you</p>
@@ -231,61 +240,58 @@ const NearbyFriends = () => {
       </div>
 
       <div className="nf-wrapper">
-        <div className="nf-map-container" ref={mapRef}>
-          {geoLoading && !locating && (
-            <div className="nf-map-loader">
-              <Loader text="Detecting your location..." />
-            </div>
+        <div className="nf-map-col">
+          <div className="nf-map-container" ref={mapRef}>
+            {geoLoading && !locating && (
+              <div className="nf-map-loader">
+                <Loader text="Detecting your location..." />
+              </div>
+            )}
+          </div>
+
+          {geoDenied && (
+            <EmptyState
+              icon={
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ margin: '0 auto' }}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                </svg>
+              }
+              title="Location access denied"
+              description="Allow location access to see nearby users on the map, then click Find Friends Near Me."
+            />
           )}
         </div>
 
-        {geoDenied && (
-          <EmptyState
-            icon={
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ margin: '0 auto' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-              </svg>
-            }
-            title="Location access denied"
-            description="Allow location access to see nearby users on the map, then click Find Friends Near Me."
-          />
-        )}
-
-        {nearbyUsers.length === 0 ? (
-          <EmptyState
-            icon={
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ margin: '0 auto' }}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-              </svg>
-            }
-            title="No users found"
-            description="No nearby users available right now."
-          />
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1.5rem' }}>
-            {nearbyUsers.map((u) => (
-              <div key={u.uid} className="panel-card animate-in">
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                  <div style={{ width: '3rem', height: '3rem', borderRadius: '50%', background: 'var(--color-primary-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.875rem', fontWeight: '700', flexShrink: 0, color: 'var(--color-text-secondary)' }}>
+        <div className="nf-friend-sidebar">
+          <div className="nf-friend-header">
+            <span>Nearby Users</span>
+            <span className="nf-friend-count">{nearbyUsers.length} found</span>
+          </div>
+          {nearbyUsers.length === 0 ? (
+            <div style={{ padding: '24px', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '13px' }}>
+              No nearby users available right now.
+            </div>
+          ) : (
+            <div className="nf-friend-list">
+              {nearbyUsers.map((u) => (
+                <div key={u.uid} className="nf-friend-card" onClick={() => handleViewProfile(u.uid)}>
+                  <div className="nf-friend-avatar">
                     {(u.displayName || 'U')[0].toUpperCase()}
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontWeight: '600' }}>{u.displayName}</p>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{formatDistance(u.distance)} away</p>
+                  <div className="nf-friend-info">
+                    <div className="nf-friend-name">{u.displayName}</div>
+                    <div className="nf-friend-distance">{formatDistance(u.distance)} away &middot; {u.online ? 'Online' : 'Offline'}</div>
                   </div>
-                  <span className={`badge ${u.online ? 'badge-success' : 'badge-muted'}`} style={{ fontSize: '0.625rem' }}>
-                    {u.online ? 'Online' : 'Offline'}
-                  </span>
+                  <div className="nf-friend-actions">
+                    <button className="btn btn-primary btn-sm" onClick={(e) => { e.stopPropagation(); handleViewProfile(u.uid); }}>Profile</button>
+                    <button className="btn btn-secondary btn-sm" onClick={(e) => { e.stopPropagation(); handleSendRequest(u.uid); }}>Add</button>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <button className="btn btn-primary btn-sm" style={{ flex: 1 }} onClick={() => handleViewProfile(u.uid)}>Profile</button>
-                  <button className="btn btn-secondary btn-sm" style={{ flex: 1 }} onClick={() => handleSendRequest(u.uid)}>Add Friend</button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

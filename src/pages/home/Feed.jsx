@@ -21,6 +21,7 @@ const Feed = () => {
   const { posts, loading, error, createPost, updatePost, deletePost, reactToPost, removeReaction, addComment } = usePosts();
 
   const [creating, setCreating] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const [localComments, setLocalComments] = useState({});
   const [sortBy, setSortBy] = useState('newest');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -149,7 +150,26 @@ const Feed = () => {
         <p className="feed-subtitle">See what's happening in your community</p>
       </div>
 
-      <PostForm onSubmit={handleCreatePost} isLoading={creating} />
+      <div className="feed-form-section">
+        <button className="feed-form-trigger" onClick={() => setShowForm(true)}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
+          </svg>
+          Want to share your ideas?
+        </button>
+        <div className={`feed-form-drawer ${showForm ? 'feed-form-drawer--open' : ''}`}>
+          <div className="feed-form-drawer-header">
+            <h3>Create Post</h3>
+            <button className="feed-form-close" onClick={() => setShowForm(false)} aria-label="Close form">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+          <PostForm onSubmit={handleCreatePost} isLoading={creating} />
+        </div>
+        {showForm && <div className="feed-form-backdrop" onClick={() => setShowForm(false)} />}
+      </div>
 
       <div className="feed-filters">
         <select
