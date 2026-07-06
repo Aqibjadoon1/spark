@@ -9,6 +9,7 @@ import useAuth from '../../hooks/useAuth';
 import { timeAgo } from '../../utils/timestampUtils';
 import { formatNumber, linkifyText } from '../../utils/formatUtils';
 import { showToast } from '../../redux/actions/uiActions';
+import { trackComment } from '../../services/analyticsService';
 import Avatar from '../../components/globals/Avatar';
 import CommentForm from '../../components/forms/CommentForm';
 import Skeleton from '../../components/globals/Skeleton';
@@ -105,6 +106,7 @@ const PostDetail = () => {
           content,
         });
         reduxDispatch(showToast('Comment added', 'success'));
+        trackComment();
       } catch {
         reduxDispatch(showToast('Failed to add comment', 'error'));
       } finally {

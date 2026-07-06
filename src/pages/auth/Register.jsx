@@ -5,6 +5,7 @@ import { registerUser, loginWithGoogle, clearError } from '../../redux/actions/a
 import { showToast } from '../../redux/actions/uiActions';
 import { ROUTES } from '../../constants/routes';
 import { useCallback } from 'react';
+import { trackRegistration } from '../../services/analyticsService';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -51,6 +52,7 @@ const Register = () => {
     try {
       await dispatch(registerUser(email, password, displayName.trim()));
       dispatch(showToast('Account created successfully!', 'success'));
+      trackRegistration();
       navigate(ROUTES.FEED, { replace: true });
     } catch (err) {
       dispatch(showToast(err.message, 'error'));

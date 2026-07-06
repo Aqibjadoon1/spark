@@ -6,6 +6,7 @@ import { showToast } from '../../redux/actions/uiActions';
 import PostCard from '../../components/cards/PostCard';
 import PostForm from '../../components/forms/PostForm';
 import { uploadPostImage } from '../../services/storageService';
+import { trackPostCreated } from '../../services/analyticsService';
 import Skeleton from '../../components/globals/Skeleton';
 
 
@@ -57,6 +58,7 @@ const Feed = () => {
         authorPhoto: user?.photoURL,
       });
       const postId = post.id;
+      if (data.category) trackPostCreated(data.category);
       if (data.image) {
         uploadPostImage(postId, data.image)
           .then((image) => updatePost(postId, { image }))
