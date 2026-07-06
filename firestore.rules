@@ -6,7 +6,7 @@ service cloud.firestore {
       allow create: if request.auth != null && request.auth.uid == uid;
       allow update: if request.auth != null && (
         request.auth.uid == uid ||
-        request.resource.data.diff(resource.data).affectedKeys().toList().hasOnly(['friendRequests', 'friends'])
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['friendRequests', 'friends'])
       );
       allow delete: if request.auth != null && request.auth.uid == uid;
     }
