@@ -834,9 +834,16 @@ body {
 .pc-header-info { flex: 1; min-width: 0; }
 .pc-author { font-size: 14px; font-weight: 700; color: var(--color-text-primary); display: block; }
 .pc-time { font-size: 12px; color: var(--color-text-muted); }
-.pc-header-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.pc-header-actions { position: relative; display: flex; gap: 4px; flex-shrink: 0; }
 .pc-icon-btn { background: none; border: none; cursor: pointer; padding: 4px 6px; border-radius: 6px; font-size: 14px; color: var(--color-text-muted); transition: all 0.15s; }
 .pc-icon-btn:hover { background: var(--border-light); color: var(--color-text-primary); }
+.pc-menu-btn { background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 6px; color: var(--color-text-muted); transition: all 0.15s; display: flex; align-items: center; }
+.pc-menu-btn:hover { background: var(--border-light); color: var(--color-text-primary); }
+.pc-menu-dropdown { position: absolute; top: 100%; right: 0; z-index: 50; min-width: 140px; background: var(--bg-surface-2); border: 1px solid var(--border-light); border-radius: var(--radius-md); box-shadow: var(--shadow-dropdown); overflow: hidden; animation: scaleIn 0.12s ease; margin-top: 4px; }
+.pc-menu-item { display: flex; align-items: center; gap: 8px; width: 100%; padding: 10px 14px; background: none; border: none; color: var(--color-text-primary); font-size: 13px; font-weight: 600; font-family: 'Nunito', sans-serif; cursor: pointer; text-align: left; transition: background 0.1s; }
+.pc-menu-item:hover { background: var(--bg-glass-hover); }
+.pc-menu-item--danger { color: var(--color-danger); }
+.pc-menu-item--danger:hover { background: rgba(255,107,107,0.08); }
 
 .pc-title { font-size: 18px; font-weight: 700; color: var(--color-text-primary); margin-bottom: 8px; line-height: 1.3; }
 .pc-content { font-size: 14px; color: rgba(255,255,255,0.60); line-height: 1.65; margin-bottom: 12px; }

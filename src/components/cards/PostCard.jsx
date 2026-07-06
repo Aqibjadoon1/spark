@@ -14,8 +14,10 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
   const [commentInput, setCommentInput] = useState('');
   const [showReactions, setShowReactions] = useState(false);
   const [longPress, setLongPress] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const likeRef = useRef(null);
   const pickerRef = useRef(null);
+  const menuRef = useRef(null);
   const longPressTimer = useRef(null);
 
   if (!post) return null;
@@ -51,16 +53,19 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
   }, []);
 
   useEffect(() => {
-    if (!showReactions) return;
+    if (!showReactions && !showMenu) return;
     const handleClickOutside = (e) => {
-      if (pickerRef.current && !pickerRef.current.contains(e.target) &&
+      if (showReactions && pickerRef.current && !pickerRef.current.contains(e.target) &&
           likeRef.current && !likeRef.current.contains(e.target)) {
         closeReactionPicker();
+      }
+      if (showMenu && menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowMenu(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showReactions, closeReactionPicker]);
+  }, [showReactions, showMenu, closeReactionPicker]);
 
   const handleLikeClick = (e) => {
     e.stopPropagation();
@@ -148,9 +153,16 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
           <span className="pc-time">{timeAgo(createdAt)} {views ? `· ${formatNumber(views)} views` : ''}</span>
         </div>
         {isAuthor && (
-          <div className="pc-header-actions">
-            <button onClick={(e) => { e.stopPropagation(); onEdit?.(post); }} className="pc-icon-btn" aria-label="Edit post">✏️</button>
-            <button onClick={(e) => { e.stopPropagation(); onDelete?.(id); }} className="pc-icon-btn" aria-label="Delete post">🗑️</button>
+          <div className="pc-header-actions" ref={menuRef}>
+            <button onClick={(e) => { e.stopPropagation(); setShowMenu((p) => !p); }} className="pc-menu-btn" aria-label="Post options">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
+            </button>
+            {showMenu && (
+              <div className="pc-menu-dropdown">
+                <button onClick={(e) => { e.stopPropagation(); onEdit?.(post); setShowMenu(false); }} className="pc-menu-item">✏️ Edit</button>
+                <button onClick={(e) => { e.stopPropagation(); onDelete?.(id); setShowMenu(false); }} className="pc-menu-item pc-menu-item--danger">🗑️ Delete</button>
+              </div>
+            )}
           </div>
         )}
       </div>
