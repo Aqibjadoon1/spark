@@ -48,31 +48,53 @@ const usePosts = () => {
   useEffect(() => {
     localDispatch({ type: 'SET_LOADING', payload: true });
 
-    const q = query(collection(db, COLLECTIONS.POSTS), orderBy('createdAt', 'desc'));
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const postsList = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        localDispatch({ type: 'SET_POSTS', payload: postsList });
-        reduxDispatch({ type: SET_POSTS, payload: postsList });
-      },
-      (error) => {
-        localDispatch({ type: 'SET_ERROR', payload: error.message });
-        reduxDispatch({ type: FETCH_POSTS_FAILURE, payload: error.message });
-      }
-    );
+    let unsub1, unsub2;
+    let realPosts = [];
+    let dummyPosts = [];
 
-    return () => unsubscribe();
+    const mergeAndDispatch = () => {
+      const merged = [...realPosts, ...dummyPosts].sort((a, b) => {
+        const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : a.createdAt?.toDate?.()?.getTime() || 0;
+        const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : b.createdAt?.toDate?.()?.getTime() || 0;
+        return bTime - aTime;
+      });
+      localDispatch({ type: 'SET_POSTS', payload: merged });
+      reduxDispatch({ type: SET_POSTS, payload: merged });
+    };
+
+    const q1 = query(collection(db, COLLECTIONS.POSTS), orderBy('createdAt', 'desc'));
+    unsub1 = onSnapshot(q1, (snapshot) => {
+      realPosts = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      mergeAndDispatch();
+    }, (error) => {
+      localDispatch({ type: 'SET_ERROR', payload: error.message });
+    });
+
+    const q2 = query(collection(db, COLLECTIONS.DUMMY_POSTS), orderBy('createdAt', 'desc'));
+    unsub2 = onSnapshot(q2, (snapshot) => {
+      dummyPosts = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      mergeAndDispatch();
+    }, (error) => {
+      localDispatch({ type: 'SET_ERROR', payload: error.message });
+    });
+
+    return () => {
+      if (unsub1) unsub1();
+      if (unsub2) unsub2();
+    };
   }, [reduxDispatch]);
 
   const fetchPosts = useCallback(async (category) => {
     reduxDispatch({ type: FETCH_POSTS_START });
     localDispatch({ type: 'SET_LOADING', payload: true });
     try {
-      const posts = await postService.getPosts(category);
+      const real = await postService.getPosts(category, undefined, undefined, COLLECTIONS.POSTS);
+      const dummy = await postService.getPosts(category, undefined, undefined, COLLECTIONS.DUMMY_POSTS);
+      const posts = [...real, ...dummy].sort((a, b) => {
+        const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+        const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+        return bTime - aTime;
+      });
       reduxDispatch({ type: FETCH_POSTS_SUCCESS, payload: posts });
       localDispatch({ type: 'SET_POSTS', payload: posts });
     } catch (error) {
@@ -85,7 +107,7 @@ const usePosts = () => {
     reduxDispatch({ type: CREATE_POST_START });
     localDispatch({ type: 'SET_LOADING', payload: true });
     try {
-      const post = await postService.createPost(data);
+      const post = await postService.createPost(data, COLLECTIONS.POSTS);
       reduxDispatch({ type: CREATE_POST_SUCCESS, payload: post });
       return post;
     } catch (error) {
@@ -99,9 +121,8 @@ const usePosts = () => {
     reduxDispatch({ type: FETCH_POSTS_START });
     localDispatch({ type: 'SET_LOADING', payload: true });
     try {
-      const post = await postService.updatePost(id, data);
-      reduxDispatch({ type: UPDATE_POST_SUCCESS, payload: post });
-      return post;
+      await postService.updatePost(id, data);
+      reduxDispatch({ type: UPDATE_POST_SUCCESS, payload: { id, ...data } });
     } catch (error) {
       reduxDispatch({ type: UPDATE_POST_FAILURE, payload: error.message });
       localDispatch({ type: 'SET_ERROR', payload: error.message });
@@ -122,40 +143,37 @@ const usePosts = () => {
     }
   }, [reduxDispatch]);
 
-  const reactToPost = useCallback(async (id, emoji) => {
+  const reactToPost = useCallback(async (id, emoji, collectionName) => {
     try {
-      const updatedPost = await postService.reactToPost(id, emoji);
-      return updatedPost;
+      await postService.reactToPost(id, emoji, undefined, collectionName);
     } catch (error) {
       localDispatch({ type: 'SET_ERROR', payload: error.message });
       throw error;
     }
   }, []);
 
-  const removeReaction = useCallback(async (id, emoji) => {
+  const removeReaction = useCallback(async (id, emoji, collectionName) => {
     try {
-      const updatedPost = await postService.removeReaction(id, emoji);
-      return updatedPost;
+      await postService.removeReaction(id, emoji, undefined, collectionName);
     } catch (error) {
       localDispatch({ type: 'SET_ERROR', payload: error.message });
       throw error;
     }
   }, []);
 
-  const addComment = useCallback(async (id, comment) => {
+  const addComment = useCallback(async (id, comment, collectionName) => {
     try {
-      const updatedPost = await postService.addComment(id, comment);
-      return updatedPost;
+      await postService.addComment(id, comment, collectionName);
     } catch (error) {
       localDispatch({ type: 'SET_ERROR', payload: error.message });
       throw error;
     }
   }, []);
 
-  const getPostById = useCallback(async (id) => {
+  const getPostById = useCallback(async (id, collectionName) => {
     localDispatch({ type: 'SET_LOADING', payload: true });
     try {
-      const post = await postService.getPostById(id);
+      const post = await postService.getPostById(id, collectionName);
       localDispatch({ type: 'SET_CURRENT_POST', payload: post });
       return post;
     } catch (error) {
@@ -164,9 +182,9 @@ const usePosts = () => {
     }
   }, []);
 
-  const incrementViews = useCallback(async (id) => {
+  const incrementViews = useCallback(async (id, collectionName) => {
     try {
-      await postService.incrementViewCount(id);
+      await postService.incrementViewCount(id, collectionName);
     } catch (error) {
       console.error('Failed to increment view count:', error);
     }
