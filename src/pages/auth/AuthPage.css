@@ -13,7 +13,7 @@
 .auth-card {
   width: 1150px;
   max-width: 100%;
-  min-height: 650px;
+  min-height: 850px;
   max-height: 90vh;
   border-radius: 24px;
   background: var(--bg-surface);
@@ -72,8 +72,8 @@
 }
 
 .auth-overlay.register-mode {
-  transform: translateX(100%);
-  clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%);
+  transform: translateX(0);
+  clip-path: polygon(0 0, 86% 0, 100% 100%, 0 100%);
 }
 
 .auth-overlay-bg {

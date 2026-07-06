@@ -46,7 +46,7 @@ const Navbar = memo(({ onToggleSidebar }) => {
 
             {profileOpen && (
               <div className="navbar-dropdown">
-                <button onClick={() => { navigate('/profile'); setProfileOpen(false); }} className="navbar-dropdown-item">
+                <button onClick={() => { navigate(`/profile/${currentUser.uid}`); setProfileOpen(false); }} className="navbar-dropdown-item">
                   Profile
                 </button>
                 <button onClick={() => { navigate('/settings'); setProfileOpen(false); }} className="navbar-dropdown-item">
