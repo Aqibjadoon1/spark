@@ -140,7 +140,9 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
   return (
     <article className="pc-card" onClick={handleClick} onKeyDown={handleKeyDown} tabIndex={0} role="article" aria-label={`Post by ${authorName}: ${title}`}>
       <div className="pc-header">
-        <Avatar src={authorPhoto} name={authorName} size="md" />
+        <div className="pc-avatar-ring">
+          <Avatar src={authorPhoto} name={authorName} size="md" />
+        </div>
         <div className="pc-header-info">
           <span className="pc-author">{authorName}</span>
           <span className="pc-time">{timeAgo(createdAt)} {views ? `· ${formatNumber(views)} views` : ''}</span>
