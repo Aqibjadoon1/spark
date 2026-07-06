@@ -394,7 +394,7 @@
 .auth-submit-btn:hover:not(:disabled) {
   filter: brightness(1.1);
   transform: translateY(-2px);
-  box-shadow: 0 15px 45px rgba(255,70,180,0.35);
+  box-shadow: 0 15px 45px rgba(255,70,180,0.55);
 }
 
 .auth-submit-btn:disabled {
@@ -445,6 +445,7 @@
   background: var(--border-light);
   border-color: var(--border-strong);
   color: rgba(255,255,255,0.80);
+  box-shadow: 0 0 20px rgba(161,92,255,0.35);
 }
 
 .auth-google-btn:disabled {

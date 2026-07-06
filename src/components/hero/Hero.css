@@ -329,7 +329,7 @@
 
 .hero-cta-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 15px 45px rgba(255,70,180,0.35);
+  box-shadow: 0 15px 45px rgba(255,70,180,0.55);
   filter: brightness(1.08);
 }
 
@@ -358,7 +358,7 @@
 .hero-cta-secondary:hover {
   background: var(--border-light);
   border-color: rgba(255,255,255,0.15);
-  box-shadow: 0 0 24px rgba(161,92,255,0.15);
+  box-shadow: 0 0 24px rgba(161,92,255,0.40);
   transform: translateY(-1px);
 }
 
@@ -817,6 +817,7 @@
 .light .hero-cta-secondary:hover {
   background: #FFFFFF;
   border-color: var(--color-primary);
+  box-shadow: 0 0 24px rgba(123,77,255,0.35);
 }
 .light .hero-tagline {
   color: var(--color-text-secondary);

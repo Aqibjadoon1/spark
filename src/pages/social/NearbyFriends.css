@@ -146,6 +146,7 @@
 
 .nf-friend-card:hover {
   border-color: var(--border-strong);
+  box-shadow: var(--shadow-hover);
 }
 
 .nf-friend-avatar {
