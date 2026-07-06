@@ -1,15 +1,22 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { timeAgo } from '../../utils/timestampUtils';
 import { truncateText, formatNumber, linkifyText } from '../../utils/formatUtils';
 import Avatar from '../globals/Avatar';
 import useUserReactions from '../../hooks/useUserReactions';
 
+const REACTION_EMOJIS = ['👍', '❤️', '🔥', '😂', '😮', '😢', '😡'];
+
 const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDelete, onEdit, currentUserId, onBookmark, isBookmarked }) => {
   const navigate = useNavigate();
   const { hasReacted, toggleReaction } = useUserReactions(currentUserId);
   const [showComments, setShowComments] = useState(false);
   const [commentInput, setCommentInput] = useState('');
+  const [showReactions, setShowReactions] = useState(false);
+  const [longPress, setLongPress] = useState(false);
+  const likeRef = useRef(null);
+  const pickerRef = useRef(null);
+  const longPressTimer = useRef(null);
 
   if (!post) return null;
 
@@ -24,7 +31,7 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
   const totalReactions = Object.values(postReactions).reduce((a, b) => a + b, 0);
   const comments = localComments || [];
   const isAuthor = currentUserId && currentUserId === authorId;
-  const reactionEmojis = ['❤️', '🔥', '👍'];
+
 
   const handleClick = (e) => {
     if (e.target.closest('button') || e.target.closest('.pc-comments-section')) return;
@@ -36,6 +43,69 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
       e.preventDefault();
       navigate(`/post/${id}`);
     }
+  };
+
+  const closeReactionPicker = useCallback(() => {
+    setShowReactions(false);
+    setLongPress(false);
+  }, []);
+
+  useEffect(() => {
+    if (!showReactions) return;
+    const handleClickOutside = (e) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target) &&
+          likeRef.current && !likeRef.current.contains(e.target)) {
+        closeReactionPicker();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showReactions, closeReactionPicker]);
+
+  const handleLikeClick = (e) => {
+    e.stopPropagation();
+    if (showReactions) {
+      closeReactionPicker();
+      return;
+    }
+    handleReactClick(e, '👍');
+  };
+
+  const handleReactionHover = () => {
+    setShowReactions(true);
+  };
+
+  const handleReactionLeave = () => {
+    setTimeout(() => {
+      if (!pickerRef.current?.matches(':hover')) {
+        setShowReactions(false);
+      }
+    }, 150);
+  };
+
+  const handlePickerSelect = (e, emoji) => {
+    handleReactClick(e, emoji);
+    closeReactionPicker();
+  };
+
+  const handleTouchStart = () => {
+    longPressTimer.current = setTimeout(() => {
+      setShowReactions(true);
+      setLongPress(true);
+    }, 500);
+  };
+
+  const handleTouchEnd = (e) => {
+    clearTimeout(longPressTimer.current);
+    if (longPress) {
+      setLongPress(false);
+      return;
+    }
+    handleLikeClick(e);
+  };
+
+  const handleTouchMove = () => {
+    clearTimeout(longPressTimer.current);
   };
 
   const handleSendComment = () => {
@@ -99,7 +169,7 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
       )}
 
       <div className="pc-reactions-bar">
-        {reactionEmojis.map((emoji) => (
+        {REACTION_EMOJIS.slice(0, 3).map((emoji) => (
           <button
             key={emoji}
             onClick={(e) => handleReactClick(e, emoji)}
@@ -122,9 +192,20 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
       </div>
 
       <div className="pc-actions-bar">
-        <button onClick={(e) => handleReactClick(e, '❤️')} className="pc-action-btn">
-          <span>❤️</span> Like
-        </button>
+        <div className="pc-like-wrap" ref={likeRef} onMouseEnter={handleReactionHover} onMouseLeave={handleReactionLeave}>
+          <button onClick={handleLikeClick} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd} onTouchMove={handleTouchMove} className="pc-action-btn">
+            <span>👍</span> Like
+          </button>
+          {showReactions && (
+            <div className="pc-reaction-picker" ref={pickerRef} onMouseEnter={() => setShowReactions(true)} onMouseLeave={handleReactionLeave}>
+              {REACTION_EMOJIS.map((emoji, i) => (
+                <button key={emoji} className={`pc-reaction-option${hasReacted(id, emoji) ? ' reacted' : ''}`} onClick={(e) => handlePickerSelect(e, emoji)} style={{ animationDelay: `${i * 0.04}s` }}>
+                  <span className="pc-reaction-emoji-large">{emoji}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
         <button onClick={handleCommentToggle} className="pc-action-btn">
           <span>💬</span> Comment
         </button>
