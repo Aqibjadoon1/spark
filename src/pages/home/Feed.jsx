@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import useAuth from '../../hooks/useAuth';
+import useUsers from '../../hooks/useUsers';
 import usePosts from '../../hooks/usePosts';
 import { showToast } from '../../redux/actions/uiActions';
 import PostCard from '../../components/cards/PostCard';
@@ -8,6 +9,7 @@ import PostForm from '../../components/forms/PostForm';
 import { uploadPostImage } from '../../services/storageService';
 import { trackPostCreated } from '../../services/analyticsService';
 import { createNotification } from '../../services/notificationService';
+import { addBookmark, removeBookmark } from '../../services/bookmarkService';
 import Skeleton from '../../components/globals/Skeleton';
 
 
@@ -15,6 +17,7 @@ import Skeleton from '../../components/globals/Skeleton';
 const Feed = () => {
   const dispatch = useDispatch();
   const { user } = useAuth();
+  const { users } = useUsers();
   const { posts, loading, error, createPost, updatePost, deletePost, reactToPost, removeReaction, addComment } = usePosts();
 
   const [creating, setCreating] = useState(false);
@@ -27,6 +30,18 @@ const Feed = () => {
   useEffect(() => {
     if (error) dispatch(showToast(error, 'error'));
   }, [error, dispatch]);
+
+  const currentUserProfile = users.find((u) => u.uid === user?.uid) || {};
+  const bookmarkedPostIds = currentUserProfile.bookmarks || [];
+
+  const handleBookmark = async (postId) => {
+    if (!user?.uid) return;
+    if (bookmarkedPostIds.includes(postId)) {
+      await removeBookmark(user.uid, postId);
+    } else {
+      await addBookmark(user.uid, postId);
+    }
+  };
 
   const allPosts = [...posts]
     .filter((p) => !categoryFilter || p.category === categoryFilter)
@@ -177,6 +192,8 @@ const Feed = () => {
                 onDelete={handleDelete}
                 onAddComment={handleAddComment}
                 currentUserId={user?.uid}
+                isBookmarked={bookmarkedPostIds.includes(post.id)}
+                onBookmark={handleBookmark}
               />
             </div>
           ))}

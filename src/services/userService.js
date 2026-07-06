@@ -33,6 +33,7 @@ export const createUserProfile = async (uid, data) => {
       ...data,
       friends: [],
       friendRequests: [],
+      bookmarks: [],
       createdAt: new Date().toISOString(),
     });
   } catch (error) {

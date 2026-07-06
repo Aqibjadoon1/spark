@@ -5,7 +5,7 @@ import { truncateText, formatNumber, linkifyText } from '../../utils/formatUtils
 import Avatar from '../globals/Avatar';
 import useUserReactions from '../../hooks/useUserReactions';
 
-const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDelete, onEdit, currentUserId }) => {
+const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDelete, onEdit, currentUserId, onBookmark, isBookmarked }) => {
   const navigate = useNavigate();
   const { hasReacted, toggleReaction } = useUserReactions(currentUserId);
   const [showComments, setShowComments] = useState(false);
@@ -128,6 +128,12 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
         <button onClick={handleCommentToggle} className="pc-action-btn">
           <span>💬</span> Comment
         </button>
+        {onBookmark && (
+          <button onClick={(e) => { e.stopPropagation(); onBookmark(id); }} className="pc-action-btn" style={{ color: isBookmarked ? 'var(--color-primary-light)' : undefined }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill={isBookmarked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+            {isBookmarked ? 'Saved' : 'Save'}
+          </button>
+        )}
       </div>
 
       {showComments && (

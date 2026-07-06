@@ -6,6 +6,8 @@ import { db } from '../../firebase/firebaseSDK';
 import { COLLECTIONS } from '../../constants/firestoreCollections';
 import usePosts from '../../hooks/usePosts';
 import useAuth from '../../hooks/useAuth';
+import useUsers from '../../hooks/useUsers';
+import { addBookmark, removeBookmark } from '../../services/bookmarkService';
 import { timeAgo } from '../../utils/timestampUtils';
 import { formatNumber, linkifyText } from '../../utils/formatUtils';
 import { showToast } from '../../redux/actions/uiActions';
@@ -23,6 +25,19 @@ const PostDetail = () => {
   const reduxDispatch = useDispatch();
   const { currentPost, loading, error, getPostById, reactToPost, removeReaction, deletePost, incrementViews } = usePosts();
   const { user } = useAuth();
+  const { users } = useUsers();
+
+  const currentUserProfile = users.find((u) => u.uid === user?.uid) || {};
+  const isBookmarked = currentUserProfile.bookmarks?.includes(id) || false;
+
+  const handleBookmark = useCallback(async () => {
+    if (!user?.uid) return;
+    if (isBookmarked) {
+      await removeBookmark(user.uid, id);
+    } else {
+      await addBookmark(user.uid, id);
+    }
+  }, [user?.uid, id, isBookmarked]);
 
   const [comments, setComments] = useState([]);
   const [commentsLoading, setCommentsLoading] = useState(true);
@@ -295,6 +310,14 @@ const PostDetail = () => {
               <span className="post-reaction-count">{formatNumber(post.reactions?.[emoji] || 0)}</span>
             </button>
           ))}
+          <button
+            onClick={handleBookmark}
+            className="post-action-btn"
+            style={{ color: isBookmarked ? 'var(--color-primary-light)' : undefined }}
+            aria-label={isBookmarked ? 'Remove bookmark' : 'Bookmark post'}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill={isBookmarked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+          </button>
           <span className="post-meta-counts">
             {formatNumber(post.viewCount || 0)} views
           </span>

@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import usePosts from '../../hooks/usePosts';
 import useAuth from '../../hooks/useAuth';
+import useUsers from '../../hooks/useUsers';
 import { showToast } from '../../redux/actions/uiActions';
 import PostCard from '../../components/cards/PostCard';
 import { createNotification } from '../../services/notificationService';
+import { addBookmark, removeBookmark } from '../../services/bookmarkService';
 import Skeleton from '../../components/globals/Skeleton';
 import EmptyState from '../../components/feedback/EmptyState';
 
@@ -21,6 +23,7 @@ const ExplorePosts = () => {
   const { user } = useAuth();
   const { posts, loading, error, deletePost, reactToPost, removeReaction, addComment } = usePosts();
 
+  const { users } = useUsers();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('trending');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -28,6 +31,18 @@ const ExplorePosts = () => {
 
   useEffect(() => { document.title = 'Explore | Elite Social'; }, []);
   useEffect(() => { if (error) dispatch(showToast(error, 'error')); }, [error, dispatch]);
+
+  const currentUserProfile = users.find((u) => u.uid === user?.uid) || {};
+  const bookmarkedPostIds = currentUserProfile.bookmarks || [];
+
+  const handleBookmark = async (postId) => {
+    if (!user?.uid) return;
+    if (bookmarkedPostIds.includes(postId)) {
+      await removeBookmark(user.uid, postId);
+    } else {
+      await addBookmark(user.uid, postId);
+    }
+  };
 
   const allPosts = useMemo(() => {
     let filtered = posts.filter((p) => {
@@ -184,6 +199,8 @@ const ExplorePosts = () => {
                 onDelete={handleDelete}
                 onAddComment={handleAddComment}
                 currentUserId={user?.uid}
+                isBookmarked={bookmarkedPostIds.includes(post.id)}
+                onBookmark={handleBookmark}
               />
             </div>
           ))}
