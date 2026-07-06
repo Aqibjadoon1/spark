@@ -169,7 +169,7 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
       )}
 
       <div className="pc-reactions-bar">
-        {REACTION_EMOJIS.slice(0, 3).map((emoji) => (
+        {REACTION_EMOJIS.filter((e) => (postReactions[e] || 0) > 0 || REACTION_EMOJIS.slice(0, 3).includes(e)).map((emoji) => (
           <button
             key={emoji}
             onClick={(e) => handleReactClick(e, emoji)}
