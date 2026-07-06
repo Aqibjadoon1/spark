@@ -2,7 +2,7 @@
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 
 body {
   font-family: 'Nunito', -apple-system, sans-serif;
@@ -1820,6 +1820,32 @@ ul, ol { list-style: none; }
   .lp-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 40px; }
   .lp-cta-btn, .lp-cta-btn-secondary { width: 100%; justify-content: center; }
   .lp-cta-actions { flex-direction: column; }
+  .lp-about { padding: 60px 16px; }
+  .lp-features { padding: 60px 16px; }
+  .lp-stats { padding: 40px 16px; }
+  .lp-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .lp-features-grid { grid-template-columns: 1fr; }
+  .lp-section-title { font-size: 28px; }
+  .lp-cta-card { padding: 32px 20px; }
+  .lp-footer { padding: 24px 16px; }
+  .lp-about-inner { padding: 0; }
+}
+
+@media (max-width: 480px) {
+  .unified-content { padding: 12px; }
+  .feed-title { font-size: 22px; }
+  .pc-card { padding: 12px; }
+  .pc-title { font-size: 15px; }
+  .pc-content { font-size: 13px; }
+  .pc-reactions-bar { gap: 4px; }
+  .pc-reaction-btn { padding: 4px 8px; font-size: 12px; }
+  .pc-actions-bar { gap: 2px; }
+  .pc-action-btn { font-size: 11px; padding: 8px 4px; gap: 3px; }
+  .lp-section-title { font-size: 24px; }
+  .lp-features-grid { gap: 16px; }
+  .lp-stat-card { padding: 16px; }
+  .lp-stat-value { font-size: 28px; }
+  .lp-cta-text { font-size: 14px; }
 }
 
 /* ====== ACCESSIBILITY ====== */
