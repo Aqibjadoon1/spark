@@ -295,14 +295,14 @@
   width: 100%;
   height: 52px;
   padding: 0 20px 0 52px;
-  background: #1A1A25;
+  background: var(--bg-surface-raised);
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   color: var(--color-text-white);
   font-family: 'Inter', sans-serif;
   font-size: 15px;
   outline: none;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: border-color 0.2s, box-shadow 0.2s;
   box-shadow: inset 0 1px rgba(255,255,255,0.02);
   box-sizing: border-box;
 }
@@ -313,7 +313,7 @@
 .auth-input::placeholder { color: var(--color-text-muted); }
 
 .auth-input.error {
-  border-color: #FF3C9D;
+  border-color: var(--color-accent);
 }
 
 .auth-field-error {
@@ -336,7 +336,7 @@
   border-radius: 4px;
   appearance: none;
   -webkit-appearance: none;
-  background: #1A1A25;
+  background: var(--bg-surface-raised);
   border: 1px solid rgba(255,255,255,0.12);
   cursor: pointer;
   display: flex;

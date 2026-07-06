@@ -1,46 +1,44 @@
 const Skeleton = ({ variant = 'text', count = 1 }) => {
   const variants = {
-    text: <div className="h-4 bg-white/10 rounded w-full skeleton" />,
+    text: <div className="skeleton" style={{ height: 16, width: '100%' }} />,
     card: (
-      <div className="card-container p-5 space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/10 rounded-full skeleton" />
-          <div className="space-y-2 flex-1">
-            <div className="h-3 bg-white/10 rounded w-1/3 skeleton" />
-            <div className="h-3 bg-white/10 rounded w-1/4 skeleton" />
+      <div className="skeleton" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div className="skeleton" style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0 }} />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div className="skeleton" style={{ height: 12, width: '35%' }} />
+            <div className="skeleton" style={{ height: 10, width: '25%' }} />
           </div>
         </div>
-        <div className="h-4 bg-white/10 rounded w-3/4 skeleton" />
-        <div className="h-4 bg-white/10 rounded w-full skeleton" />
-        <div className="h-4 bg-white/10 rounded w-2/3 skeleton" />
+        <div className="skeleton" style={{ height: 16, width: '75%' }} />
+        <div className="skeleton" style={{ height: 14, width: '100%' }} />
+        <div className="skeleton" style={{ height: 14, width: '65%' }} />
       </div>
     ),
-    avatar: <div className="w-12 h-12 bg-white/10 rounded-full shrink-0 skeleton" />,
+    avatar: <div className="skeleton" style={{ width: 44, height: 44, borderRadius: '50%', flexShrink: 0 }} />,
     post: (
-      <div className="card-container p-6 space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/10 rounded-full skeleton" />
-          <div className="space-y-2 flex-1">
-            <div className="h-3 bg-white/10 rounded w-1/4 skeleton" />
-            <div className="h-3 bg-white/10 rounded w-1/5 skeleton" />
+      <div className="skeleton pc-card" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div className="skeleton" style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0 }} />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div className="skeleton" style={{ height: 12, width: '30%' }} />
+            <div className="skeleton" style={{ height: 10, width: '20%' }} />
           </div>
         </div>
-        <div className="h-5 bg-white/10 rounded w-2/3 skeleton" />
-        <div className="space-y-2">
-          <div className="h-3 bg-white/10 rounded w-full skeleton" />
-          <div className="h-3 bg-white/10 rounded w-5/6 skeleton" />
-          <div className="h-3 bg-white/10 rounded w-3/4 skeleton" />
-        </div>
-        <div className="flex gap-2">
-          <div className="h-6 bg-white/10 rounded-full w-16 skeleton" />
-          <div className="h-6 bg-white/10 rounded-full w-20 skeleton" />
+        <div className="skeleton" style={{ height: 20, width: '65%' }} />
+        <div className="skeleton" style={{ height: 14, width: '100%' }} />
+        <div className="skeleton" style={{ height: 14, width: '85%' }} />
+        <div className="skeleton" style={{ height: 14, width: '70%' }} />
+        <div style={{ display: 'flex', gap: 6 }}>
+          <div className="skeleton" style={{ height: 28, width: 70, borderRadius: 999 }} />
+          <div className="skeleton" style={{ height: 28, width: 90, borderRadius: 999 }} />
         </div>
       </div>
     ),
   };
 
   return (
-    <div className="space-y-3" role="status" aria-label="Loading content">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }} role="status" aria-label="Loading content">
       {Array.from({ length: count }).map((_, i) => (
         <div key={i}>{variants[variant] || variants.text}</div>
       ))}

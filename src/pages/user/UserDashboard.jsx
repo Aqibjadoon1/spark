@@ -67,15 +67,15 @@ const UserDashboard = () => {
         </div>
       ) : (
         <div className="dashboard-stat-grid">
-          <div className="dashboard-stat-card">
+          <div className="dashboard-stat-card" data-stagger style={{ '--i': 0 }}>
             <div className="dash-stat-label">My Posts</div>
             <div className="dash-stat-value">{myPosts.length}</div>
           </div>
-          <div className="dashboard-stat-card">
+          <div className="dashboard-stat-card" data-stagger style={{ '--i': 1 }}>
             <div className="dash-stat-label">Total Reactions</div>
             <div className="dash-stat-value">{totalReactions}</div>
           </div>
-          <div className="dashboard-stat-card">
+          <div className="dashboard-stat-card" data-stagger style={{ '--i': 2 }}>
             <div className="dash-stat-label">Total Views</div>
             <div className="dash-stat-value">{totalViews}</div>
           </div>
