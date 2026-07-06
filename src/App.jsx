@@ -9,6 +9,9 @@ import { setUser, setAuthLoading } from './redux/actions/authActions';
 import routes from './routes/routes.jsx';
 import Loader from './components/globals/Loader';
 import SplashScreen from './components/ui/SplashScreen';
+import { seedDummyData } from './services/seedData';
+import { trackLogin } from './services/analyticsService';
+import { COLLECTIONS } from './constants/firestoreCollections';
 
 const AppRoutes = () => useRoutes(routes);
 
@@ -18,10 +21,14 @@ const App = () => {
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
+    seedDummyData();
+  }, []);
+
+  useEffect(() => {
     dispatch(setAuthLoading(true));
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const snap = await getDoc(doc(db, 'users', user.uid));
+        const snap = await getDoc(doc(db, COLLECTIONS.USERS, user.uid));
         dispatch(setUser({
           uid: user.uid,
           email: user.email,
@@ -29,6 +36,7 @@ const App = () => {
           photoURL: user.photoURL,
           role: snap.exists() ? snap.data().role : 'user',
         }));
+        trackLogin();
       } else {
         dispatch(setUser(null));
       }
