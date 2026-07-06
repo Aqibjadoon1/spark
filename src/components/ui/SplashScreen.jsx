@@ -47,12 +47,19 @@ const SplashScreen = ({ onFinish }) => {
         </svg>
       </div>
 
-      <div className="splash-brand-row">
-        <span className="splash-brand-letter">S</span>
-        <span className="splash-brand-letter">P</span>
-        <span className="splash-brand-letter">A</span>
-        <span className="splash-brand-letter">R</span>
-        <span className="splash-brand-letter">K</span>
+      <div className="splash-brand-row" style={{ gap: 2 }}>
+        <span className="splash-brand-letter" style={{ animationDelay: '0.7s' }}>E</span>
+        <span className="splash-brand-letter" style={{ animationDelay: '0.8s' }}>L</span>
+        <span className="splash-brand-letter" style={{ animationDelay: '0.9s' }}>I</span>
+        <span className="splash-brand-letter" style={{ animationDelay: '1.0s' }}>T</span>
+        <span className="splash-brand-letter" style={{ animationDelay: '1.1s' }}>E</span>
+        <span className="splash-brand-letter" style={{ width: 12, opacity: 0, animation: 'none' }} />
+        <span className="splash-brand-letter" style={{ animationDelay: '1.2s' }}>S</span>
+        <span className="splash-brand-letter" style={{ animationDelay: '1.3s' }}>O</span>
+        <span className="splash-brand-letter" style={{ animationDelay: '1.4s' }}>C</span>
+        <span className="splash-brand-letter" style={{ animationDelay: '1.5s' }}>I</span>
+        <span className="splash-brand-letter" style={{ animationDelay: '1.6s' }}>A</span>
+        <span className="splash-brand-letter" style={{ animationDelay: '1.7s' }}>L</span>
       </div>
 
       <span className="splash-tagline">Level Up Your Social Game</span>
