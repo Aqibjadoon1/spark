@@ -8,13 +8,7 @@ import PostForm from '../../components/forms/PostForm';
 import { uploadPostImage } from '../../services/storageService';
 import Skeleton from '../../components/globals/Skeleton';
 
-const dummyPosts = [
-  { id: 'dummy-1', authorId: 'dummy', authorName: 'Sarah Chen', authorPhoto: null, category: 'technology', content: 'AI is transforming how we build for the web. From intelligent code completion to automated accessibility audits, the tools we use are becoming smarter by the day. I believe the next frontier is AI-assisted UX design — imagine describing an interaction pattern in plain English and watching it come to life.', title: 'The Future of AI in Web Development', tags: ['ai', 'webdev', 'future'], reactions: { '❤️': 142, '🔥': 88, '👍': 112 }, reactionCount: 342, views: 1284, commentCount: 28, createdAt: { toMillis: () => Date.now() - 3 * 3600000 } },
-  { id: 'dummy-2', authorId: 'dummy', authorName: 'Marcus Johnson', authorPhoto: null, category: 'technology', content: 'After spending six months with Rust, I can confidently say it\'s worth the hype. The type system catches bugs that would slip through in JavaScript, and the performance is unreal. WASM compilation makes it a natural fit for web development.', title: 'Rust for Frontend Devs in 2026', tags: ['rust', 'wasm', 'frontend'], reactions: { '❤️': 96, '🔥': 120, '👍': 40 }, reactionCount: 256, views: 972, commentCount: 31, createdAt: { toMillis: () => Date.now() - 5 * 3600000 } },
-  { id: 'dummy-3', authorId: 'dummy', authorName: 'Emily Watson', authorPhoto: null, category: 'technology', content: 'Container queries solve one of the biggest pain points in responsive design. No more media queries based on viewport — components can adapt to their parent container. This changes everything for component libraries.', title: 'CSS Container Queries Are Finally Here', tags: ['css', 'responsive', 'design'], reactions: { '❤️': 72, '🔥': 45, '👍': 72 }, reactionCount: 189, views: 845, commentCount: 14, createdAt: { toMillis: () => Date.now() - 8 * 3600000 } },
-  { id: 'dummy-4', authorId: 'dummy', authorName: 'David Kim', authorPhoto: null, category: 'technology', content: 'A design system is more than a component library — it\'s a shared language between design and engineering. Here\'s how we built ours from scratch, including tokens, documentation, and adoption strategies.', title: 'Building a Design System with React', tags: ['design-system', 'react', 'frontend'], reactions: { '❤️': 88, '🔥': 34, '👍': 45 }, reactionCount: 167, views: 703, commentCount: 19, createdAt: { toMillis: () => Date.now() - 12 * 3600000 } },
-  { id: 'dummy-5', authorId: 'dummy', authorName: 'Alex Rivera', authorPhoto: null, category: 'technology', content: 'Edge computing isn\'t just about latency — it\'s about where your code runs. With edge functions, you can personalize content, handle authentication, and process data closer to your users than ever before.', title: 'Why Edge Computing Matters Now', tags: ['edge', 'cloud', 'performance'], reactions: { '❤️': 54, '🔥': 28, '👍': 52 }, reactionCount: 134, views: 612, commentCount: 11, createdAt: { toMillis: () => Date.now() - 24 * 3600000 } },
-];
+
 
 const Feed = () => {
   const dispatch = useDispatch();
@@ -33,7 +27,7 @@ const Feed = () => {
     if (error) dispatch(showToast(error, 'error'));
   }, [error, dispatch]);
 
-  const allPosts = [...dummyPosts, ...posts]
+  const allPosts = [...posts]
     .filter((p) => !categoryFilter || p.category === categoryFilter)
     .sort((a, b) => {
       if (sortBy === 'popular') {
