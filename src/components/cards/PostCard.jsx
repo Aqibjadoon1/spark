@@ -155,7 +155,7 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
         {isAuthor && (
           <div className="pc-header-actions" ref={menuRef}>
             <button onClick={(e) => { e.stopPropagation(); setShowMenu((p) => !p); }} className="pc-menu-btn" aria-label="Post options">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="3" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="13" r="1.5"/></svg>
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="5" r="2"/><circle cx="10" cy="10" r="2"/><circle cx="10" cy="15" r="2"/></svg>
             </button>
             {showMenu && (
               <div className="pc-menu-dropdown">
