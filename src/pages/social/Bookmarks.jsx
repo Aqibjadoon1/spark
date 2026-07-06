@@ -55,14 +55,13 @@ const Bookmarks = () => {
       ) : (
         <div className="feed-timeline">
           {bookmarkedPosts.map((post) => (
-            <div className="feed-post-wrapper" key={post.id}>
               <PostCard
+                key={post.id}
                 post={post}
                 currentUserId={user?.uid}
                 isBookmarked={bookmarkedPostIds.includes(post.id)}
                 onBookmark={handleBookmark}
               />
-            </div>
           ))}
         </div>
       )}

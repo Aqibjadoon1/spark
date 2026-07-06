@@ -16,7 +16,7 @@ body {
 
 @media (prefers-reduced-motion: no-preference) {
   a, button, input, select, textarea,
-  .btn, .post-card, .pc-card, .feed-post-wrapper,
+   .btn, .post-card, .pc-card,
   .navbar-dropdown-item, .sidebar-nav-item, .profile-tab,
   .task-checkbox, .badge-icon, .rs-tag, .rs-follow-btn {
     transition: background-color 250ms, color 250ms, border-color 250ms, box-shadow 250ms, transform 250ms;
@@ -420,33 +420,7 @@ body {
   gap: 20px;
 }
 
-.feed-post-wrapper {
-  background: var(--bg-glass);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-2xl);
-  padding: 20px;
-  box-shadow: 0 20px 50px var(--shadow-card);
-  transition: box-shadow 0.2s, transform 0.2s;
-}
 
-.feed-post-wrapper:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-hover);
-}
-
-.feed-post-wrapper .post-card {
-  background: transparent;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 0;
-  margin: 0;
-}
-
-.feed-post-wrapper .post-card:hover {
-  box-shadow: none;
-}
 
 .feed-pagination {
   display: flex;
@@ -1474,7 +1448,6 @@ body {
   .cp-title { font-size: 24px; }
   .feed-filters { flex-direction: column; }
   .feed { gap: 16px; }
-  .feed-post-wrapper { padding: 16px; }
   .pc-card { padding: 16px; }
   .pc-reactions-bar { flex-wrap: wrap; }
   .pc-action-btn { font-size: 12px; gap: 4px; padding: 8px 6px; }

@@ -204,8 +204,8 @@ const Feed = () => {
       ) : (
         <div className="feed-timeline">
           {allPosts.map((post) => (
-            <div className="feed-post-wrapper" key={post.id}>
               <PostCard
+                key={post.id}
                 post={post}
                 localComments={localComments[post.id]}
                 onReact={handleReact}
@@ -215,7 +215,6 @@ const Feed = () => {
                 isBookmarked={bookmarkedPostIds.includes(post.id)}
                 onBookmark={handleBookmark}
               />
-            </div>
           ))}
         </div>
       )}
