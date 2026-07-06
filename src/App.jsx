@@ -3,7 +3,7 @@ import { useRoutes } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db } from './firebase/firebaseSDK';
 import { setUser, setAuthLoading } from './redux/actions/authActions';
 import routes from './routes/routes.jsx';
@@ -21,14 +21,23 @@ const App = () => {
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
-    seedDummyData();
-  }, []);
-
-  useEffect(() => {
     dispatch(setAuthLoading(true));
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const snap = await getDoc(doc(db, COLLECTIONS.USERS, user.uid));
+        const userRef = doc(db, COLLECTIONS.USERS, user.uid);
+        const snap = await getDoc(userRef);
+        if (!snap.exists()) {
+          await setDoc(userRef, {
+            email: user.email,
+            displayName: user.displayName || user.email?.split('@')[0],
+            name: user.displayName || user.email?.split('@')[0],
+            photoURL: user.photoURL || '',
+            role: 'user',
+            friends: [],
+            friendRequests: [],
+            createdAt: new Date().toISOString(),
+          });
+        }
         dispatch(setUser({
           uid: user.uid,
           email: user.email,
@@ -36,6 +45,7 @@ const App = () => {
           photoURL: user.photoURL,
           role: snap.exists() ? snap.data().role : 'user',
         }));
+        seedDummyData();
         trackLogin();
       } else {
         dispatch(setUser(null));

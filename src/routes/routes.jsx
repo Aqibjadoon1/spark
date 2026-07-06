@@ -19,6 +19,7 @@ const TrendingPosts = lazy(() => import('../pages/home/TrendingPosts'));
 const PostDetail = lazy(() => import('../pages/social/PostDetail'));
 const PublicProfile = lazy(() => import('../pages/social/PublicProfile'));
 const EditProfile = lazy(() => import('../pages/social/EditProfile'));
+const Friends = lazy(() => import('../pages/social/Friends'));
 const NearbyFriends = lazy(() => import('../pages/social/NearbyFriends'));
 const Settings = lazy(() => import('../pages/social/Settings'));
 const Bookmarks = lazy(() => import('../pages/social/Bookmarks'));
@@ -50,6 +51,7 @@ const routes = [
       { path: 'post/:id', element: <ProtectedRoute><PostDetail /></ProtectedRoute> },
       { path: 'profile/:uid', element: <ProtectedRoute><PublicProfile /></ProtectedRoute> },
       { path: 'profile/edit', element: <ProtectedRoute><EditProfile /></ProtectedRoute> },
+      { path: 'friends', element: <ProtectedRoute><Friends /></ProtectedRoute> },
       { path: 'nearby', element: <ProtectedRoute><NearbyFriends /></ProtectedRoute> },
       { path: 'settings', element: <ProtectedRoute><Settings /></ProtectedRoute> },
       { path: 'bookmarks', element: <ProtectedRoute><Bookmarks /></ProtectedRoute> },

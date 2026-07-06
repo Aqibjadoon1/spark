@@ -64,7 +64,7 @@ const usePosts = () => {
 
     const q1 = query(collection(db, COLLECTIONS.POSTS), orderBy('createdAt', 'desc'));
     unsub1 = onSnapshot(q1, (snapshot) => {
-      realPosts = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      realPosts = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), _collection: COLLECTIONS.POSTS }));
       mergeAndDispatch();
     }, (error) => {
       localDispatch({ type: 'SET_ERROR', payload: error.message });
@@ -72,7 +72,7 @@ const usePosts = () => {
 
     const q2 = query(collection(db, COLLECTIONS.DUMMY_POSTS), orderBy('createdAt', 'desc'));
     unsub2 = onSnapshot(q2, (snapshot) => {
-      dummyPosts = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      dummyPosts = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data(), _collection: COLLECTIONS.DUMMY_POSTS }));
       mergeAndDispatch();
     }, (error) => {
       localDispatch({ type: 'SET_ERROR', payload: error.message });
@@ -88,8 +88,8 @@ const usePosts = () => {
     reduxDispatch({ type: FETCH_POSTS_START });
     localDispatch({ type: 'SET_LOADING', payload: true });
     try {
-      const real = await postService.getPosts(category, undefined, undefined, COLLECTIONS.POSTS);
-      const dummy = await postService.getPosts(category, undefined, undefined, COLLECTIONS.DUMMY_POSTS);
+      const real = (await postService.getPosts(category, undefined, undefined, COLLECTIONS.POSTS)).map(p => ({ ...p, _collection: COLLECTIONS.POSTS }));
+      const dummy = (await postService.getPosts(category, undefined, undefined, COLLECTIONS.DUMMY_POSTS)).map(p => ({ ...p, _collection: COLLECTIONS.DUMMY_POSTS }));
       const posts = [...real, ...dummy].sort((a, b) => {
         const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
         const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
@@ -117,11 +117,11 @@ const usePosts = () => {
     }
   }, [reduxDispatch]);
 
-  const updatePost = useCallback(async (id, data) => {
+  const updatePost = useCallback(async (id, data, collectionName) => {
     reduxDispatch({ type: FETCH_POSTS_START });
     localDispatch({ type: 'SET_LOADING', payload: true });
     try {
-      await postService.updatePost(id, data);
+      await postService.updatePost(id, data, collectionName);
       reduxDispatch({ type: UPDATE_POST_SUCCESS, payload: { id, ...data } });
     } catch (error) {
       reduxDispatch({ type: UPDATE_POST_FAILURE, payload: error.message });
@@ -130,11 +130,11 @@ const usePosts = () => {
     }
   }, [reduxDispatch]);
 
-  const deletePost = useCallback(async (id) => {
+  const deletePost = useCallback(async (id, collectionName) => {
     reduxDispatch({ type: FETCH_POSTS_START });
     localDispatch({ type: 'SET_LOADING', payload: true });
     try {
-      await postService.deletePost(id);
+      await postService.deletePost(id, collectionName);
       reduxDispatch({ type: DELETE_POST_SUCCESS, payload: id });
     } catch (error) {
       reduxDispatch({ type: DELETE_POST_FAILURE, payload: error.message });

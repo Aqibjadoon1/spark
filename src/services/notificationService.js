@@ -54,17 +54,20 @@ export const markAllNotificationsRead = async (userId) => {
   }
 };
 
-export const subscribeToNotifications = (userId, callback) => {
+export const subscribeToNotifications = (userId, callback, onError) => {
   try {
     const q = query(notifRef(), where('userId', '==', userId), orderBy('createdAt', 'desc'));
     return onSnapshot(q, (snapshot) => {
       const notifs = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
       callback(notifs);
     }, (error) => {
-      throw new Error(`Notification subscription error: ${error.message}`);
+      if (onError) onError(error);
+      else console.warn('Notification subscription error:', error.message);
     });
   } catch (error) {
-    throw new Error(`Failed to subscribe to notifications: ${error.message}`);
+    if (onError) onError(error);
+    else console.warn('Failed to subscribe to notifications:', error.message);
+    return () => {};
   }
 };
 

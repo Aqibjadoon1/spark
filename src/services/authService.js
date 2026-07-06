@@ -17,7 +17,9 @@ import {
   browserLocalPersistence,
   browserSessionPersistence,
 } from 'firebase/auth';
-import { auth } from '../firebase/firebaseSDK';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase/firebaseSDK';
+import { createUserProfile } from './userService';
 
 /**
  * Log in a user with email and password.
@@ -45,6 +47,13 @@ export const registerUser = async (email, password, displayName) => {
   try {
     const credential = await createUserWithEmailAndPassword(auth, email, password);
     await credential.user.updateProfile({ displayName });
+    await createUserProfile(credential.user.uid, {
+      email,
+      displayName,
+      name: displayName,
+      photoURL: credential.user.photoURL || '',
+      role: 'user',
+    });
     return credential.user;
   } catch (error) {
     throw new Error(`Registration failed: ${error.message}`);
@@ -59,6 +68,17 @@ export const loginWithGoogle = async () => {
   try {
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup(auth, provider);
+    const { user } = result;
+    const snap = await getDoc(doc(db, 'users', user.uid));
+    if (!snap.exists()) {
+      await createUserProfile(user.uid, {
+        email: user.email,
+        displayName: user.displayName || user.email?.split('@')[0],
+        name: user.displayName || user.email?.split('@')[0],
+        photoURL: user.photoURL || '',
+        role: 'user',
+      });
+    }
     return result;
   } catch (error) {
     throw new Error(`Google login failed: ${error.message}`);

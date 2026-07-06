@@ -1,7 +1,7 @@
 import { useReducer, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { auth, db, firebaseAvailable } from '../firebase/firebaseSDK';
 import * as authService from '../services/authService';
 import * as userService from '../services/userService';
@@ -60,11 +60,22 @@ const useAuth = () => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         try {
-          const userDoc = await getDoc(doc(db, COLLECTIONS.USERS, firebaseUser.uid));
-          const profile = userDoc.exists()
-            ? { uid: firebaseUser.uid, email: firebaseUser.email, ...userDoc.data() }
-            : { uid: firebaseUser.uid, email: firebaseUser.email };
-
+          const userRef = doc(db, COLLECTIONS.USERS, firebaseUser.uid);
+          const userDoc = await getDoc(userRef);
+          if (!userDoc.exists()) {
+            await setDoc(userRef, {
+              email: firebaseUser.email,
+              displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0],
+              name: firebaseUser.displayName || firebaseUser.email?.split('@')[0],
+              photoURL: firebaseUser.photoURL || '',
+              role: 'user',
+              friends: [],
+              friendRequests: [],
+              createdAt: new Date().toISOString(),
+            });
+          }
+          const snap = await getDoc(userRef);
+          const profile = { uid: firebaseUser.uid, email: firebaseUser.email, ...snap.data() };
           localDispatch({ type: 'SET_USER', payload: profile });
           reduxDispatch({ type: SET_USER, payload: profile });
         } catch (err) {

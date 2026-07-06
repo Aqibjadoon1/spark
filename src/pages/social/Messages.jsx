@@ -1,10 +1,12 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import useAuth from '../../hooks/useAuth';
+import useUsers from '../../hooks/useUsers';
 import {
   subscribeToConversations,
   subscribeToMessages,
   sendMessage,
   markMessagesRead,
+  createConversation,
 } from '../../services/messageService';
 
 const formatTime = (timestamp) => {
@@ -20,11 +22,19 @@ const formatTime = (timestamp) => {
 
 const Messages = () => {
   const { user } = useAuth();
+  const { users } = useUsers();
   const [conversations, setConversations] = useState([]);
   const [messages, setMessages] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [input, setInput] = useState('');
+  const [showNewChat, setShowNewChat] = useState(false);
   const chatEndRef = useRef(null);
+
+  const userMap = useMemo(() => {
+    const map = {};
+    users.forEach((u) => { map[u.uid] = u; });
+    return map;
+  }, [users]);
 
   useEffect(() => { document.title = 'Messages | Spark'; }, []);
 
@@ -47,6 +57,36 @@ const Messages = () => {
 
   const selected = conversations.find((c) => c.id === selectedId);
 
+  const otherUsers = users.filter((u) => u.uid !== user?.uid);
+
+  const getOtherParticipant = (conv) => {
+    if (!conv?.participants || !user?.uid) return { name: 'Unknown', avatar: '?', color: '#7B4DFF', online: false };
+    const otherId = conv.participants.find((p) => p !== user?.uid);
+    const userData = userMap[otherId];
+    if (userData) {
+      const name = userData.displayName || userData.name || otherId.slice(0, 5);
+      const photo = userData.photoURL || userData.photoURL || null;
+      const initial = (userData.displayName || userData.name || '?').charAt(0).toUpperCase();
+      return { name, avatar: photo ? '' : initial, photoUrl: photo, uid: otherId, online: false };
+    }
+    return { name: otherId ? otherId.slice(0, 5) : 'Unknown', avatar: otherId?.charAt(0)?.toUpperCase() || '?', uid: otherId, online: false };
+  };
+
+  const handleNewChat = async (targetUid) => {
+    setShowNewChat(false);
+    const existing = conversations.find((c) =>
+      c.participants.length === 2 && c.participants.includes(user?.uid) && c.participants.includes(targetUid)
+    );
+    if (existing) {
+      setSelectedId(existing.id);
+      return;
+    }
+    try {
+      const docRef = await createConversation([user?.uid, targetUid]);
+      setSelectedId(docRef.id);
+    } catch {}
+  };
+
   const handleSend = async () => {
     if (!input.trim() || !selectedId) return;
     try {
@@ -59,10 +99,22 @@ const Messages = () => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
-  const getOtherParticipant = (conv) => {
-    if (!conv?.participants || !user?.uid) return { name: 'Unknown', avatar: '?', color: '#7B4DFF', online: false };
-    const otherId = conv.participants.find((p) => p !== user?.uid);
-    return { name: otherId ? otherId.slice(0, 5) : 'Unknown', avatar: otherId?.charAt(0)?.toUpperCase() || '?', color: '#7B4DFF', online: false, uid: otherId };
+  const AvatarBlock = ({ other, size }) => {
+    const dim = size === 'sm' ? 32 : 38;
+    const fontSize = size === 'sm' ? 11 : 12;
+    if (other.photoUrl) {
+      return <img src={other.photoUrl} alt={other.name} style={{ width: dim, height: dim, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />;
+    }
+    return (
+      <div style={{
+        width: dim, height: dim, borderRadius: '50%',
+        background: 'linear-gradient(135deg, #7B4DFF, var(--border-medium))',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontSize, fontWeight: 700, color: 'var(--color-text-white)', flexShrink: 0,
+      }}>
+        {other.avatar}
+      </div>
+    );
   };
 
   return (
@@ -72,64 +124,66 @@ const Messages = () => {
         <p className="feed-subtitle">Private conversations</p>
       </div>
 
-      <div style={{ display: 'flex', flex: 1, minHeight: 0, background: 'var(--bg-glass)', borderRadius: 20, border: '1px solid var(--border-light)', overflow: 'hidden' }}>
-        <div style={{ width: 280, flexShrink: 0, borderRight: '1px solid var(--border-light)', overflowY: 'auto' }}>
-          {conversations.map((c) => {
-            const other = getOtherParticipant(c);
-            return (
-              <div
-                key={c.id}
-                onClick={() => setSelectedId(c.id)}
-                style={{
-                  padding: '12px 16px', cursor: 'pointer',
-                  background: selectedId === c.id ? 'var(--bg-sidebar-active)' : 'transparent',
-                  borderLeft: selectedId === c.id ? '2px solid var(--color-primary-light)' : '2px solid transparent',
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  transition: 'background 0.2s',
-                }}
-              >
-                <div style={{ position: 'relative', flexShrink: 0 }}>
-                  <div style={{
-                    width: 38, height: 38, borderRadius: '50%',
-                    background: `linear-gradient(135deg, ${other.color}, var(--border-medium))`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 12, fontWeight: 700, color: 'var(--color-text-white)',
-                  }}>
-                    {other.avatar}
+      <div className="messages-container">
+        <div className="messages-list">
+          <div style={{ padding: '12px', borderBottom: '1px solid var(--border-light)' }}>
+            <button
+              onClick={() => setShowNewChat(true)}
+              style={{
+                width: '100%', padding: '8px 12px', borderRadius: 10, border: '1px dashed var(--border-medium)',
+                background: 'transparent', color: 'var(--color-text-primary)', fontSize: 13, fontWeight: 600,
+                cursor: 'pointer', transition: 'background 0.2s',
+              }}
+            >
+              + New Message
+            </button>
+          </div>
+          <div style={{ overflowY: 'auto', flex: 1 }}>
+            {conversations.map((c) => {
+              const other = getOtherParticipant(c);
+              return (
+                <div
+                  key={c.id}
+                  onClick={() => setSelectedId(c.id)}
+                  style={{
+                    padding: '12px 16px', cursor: 'pointer',
+                    background: selectedId === c.id ? 'var(--bg-sidebar-active)' : 'transparent',
+                    borderLeft: selectedId === c.id ? '2px solid var(--color-primary-light)' : '2px solid transparent',
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    transition: 'background 0.2s',
+                  }}
+                >
+                  <AvatarBlock other={other} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>{other.name}</span>
+                      <span style={{ fontSize: 11, color: 'var(--color-text-placeholder)' }}>{c.lastMessage?.createdAt ? formatTime(c.lastMessage.createdAt) : ''}</span>
+                    </div>
+                    <p style={{
+                      fontSize: 12, color: 'var(--color-text-subtitle)',
+                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: 0,
+                    }}>
+                      {c.lastMessage?.text || 'No messages yet'}
+                    </p>
                   </div>
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>{other.name}</span>
-                    <span style={{ fontSize: 11, color: 'var(--color-text-placeholder)' }}>{c.lastMessage?.createdAt ? formatTime(c.lastMessage.createdAt) : ''}</span>
-                  </div>
-                  <p style={{
-                    fontSize: 12, color: 'var(--color-text-subtitle)',
-                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', margin: 0,
-                  }}>
-                    {c.lastMessage?.text || 'No messages yet'}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+        <div className={`messages-chat${selected ? ' messages-chat--active' : ''}`}>
           {selected ? (
             <>
               <div style={{
                 padding: '14px 20px', borderBottom: '1px solid var(--border-light)',
                 display: 'flex', alignItems: 'center', gap: 10,
               }}>
-                <div style={{
-                  width: 32, height: 32, borderRadius: '50%',
-                  background: `linear-gradient(135deg, ${getOtherParticipant(selected).color}, var(--border-medium))`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 11, fontWeight: 700, color: 'var(--color-text-white)', flexShrink: 0,
-                }}>
-                  {getOtherParticipant(selected).avatar}
-                </div>
+                <button className="messages-back-btn" onClick={() => setSelectedId(null)}>
+                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M15 10H5M5 10L9 6M5 10L9 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  Back
+                </button>
+                <AvatarBlock other={getOtherParticipant(selected)} size="sm" />
                 <div>
                   <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-text-primary)' }}>{getOtherParticipant(selected).name}</div>
                 </div>
@@ -208,6 +262,56 @@ const Messages = () => {
           )}
         </div>
       </div>
+
+      {showNewChat && (
+        <div
+          onClick={() => setShowNewChat(false)}
+          style={{
+            position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: 'var(--bg-surface)', borderRadius: 20, padding: 24,
+              width: 360, maxHeight: '70vh', overflowY: 'auto',
+              border: '1px solid var(--border-light)',
+            }}
+          >
+            <h2 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 16px', color: 'var(--color-text-primary)' }}>New Message</h2>
+            {otherUsers.length === 0 ? (
+              <p style={{ color: 'var(--color-text-placeholder)', fontSize: 13 }}>No other users found</p>
+            ) : (
+              otherUsers.map((u) => (
+                <div
+                  key={u.uid}
+                  onClick={() => handleNewChat(u.uid)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10, padding: '10px 12px',
+                    borderRadius: 12, cursor: 'pointer', transition: 'background 0.2s',
+                  }}
+                >
+                  {u.photoURL ? (
+                    <img src={u.photoURL} alt={u.displayName || u.name} style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
+                  ) : (
+                    <div style={{
+                      width: 36, height: 36, borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #7B4DFF, var(--border-medium))',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 12, fontWeight: 700, color: 'var(--color-text-white)',
+                    }}>
+                      {(u.displayName || u.name || '?').charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--color-text-primary)' }}>{u.displayName || u.name || u.uid.slice(0, 5)}</span>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

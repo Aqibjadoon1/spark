@@ -8,6 +8,7 @@ import useAuth from '../../hooks/useAuth';
 const icons = {
   feed: <svg viewBox="0 0 24 24" fill="none"><path d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>,
   explore: <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2"/><path d="M21 21l-4.35-4.35M11 8a3 3 0 00-3 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>,
+  friends: <svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" strokeWidth="2"/><circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" strokeWidth="2"/></svg>,
   nearby: <svg viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" strokeWidth="2"/><circle cx="12" cy="10" r="3" stroke="currentColor" strokeWidth="2"/></svg>,
   messages: <svg viewBox="0 0 24 24" fill="none"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>,
   bookmarks: <svg viewBox="0 0 24 24" fill="none"><path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" stroke="currentColor" strokeWidth="2"/></svg>,
@@ -21,6 +22,7 @@ const icons = {
 const navItems = [
   { path: '/feed', icon: 'feed', label: 'Feed' },
   { path: '/trending', icon: 'explore', label: 'Explore' },
+  { path: '/friends', icon: 'friends', label: 'Friends' },
   { path: '/nearby', icon: 'nearby', label: 'Nearby' },
   { path: '/messages', icon: 'messages', label: 'Messages' },
   { path: '/bookmarks', icon: 'bookmarks', label: 'Bookmarks' },
@@ -30,7 +32,7 @@ const navItems = [
   { path: '/settings', icon: 'settings', label: 'Settings' },
 ];
 
-const LeftSidebar = () => {
+const LeftSidebar = ({ mobileOpen, onClose }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -43,6 +45,11 @@ const LeftSidebar = () => {
     return location.pathname.startsWith(path);
   };
 
+  const handleNav = (path) => {
+    navigate(path);
+    if (onClose) onClose();
+  };
+
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -53,14 +60,14 @@ const LeftSidebar = () => {
   };
 
   return (
-    <aside className="left-sidebar">
+    <aside className={`left-sidebar${mobileOpen ? ' left-sidebar--open' : ''}`}>
       <nav className="left-sidebar-nav">
         {navItems.map((item) => {
           const navPath = item.icon === 'profile' ? `/profile/${user?.uid}` : item.path;
           return (
             <button
               key={item.path}
-              onClick={() => navigate(navPath)}
+              onClick={() => handleNav(navPath)}
               className={`sidebar-nav-item${isActive(item.path) ? ' active' : ''}`}
             >
               <span className="sidebar-nav-icon">{icons[item.icon]}</span>

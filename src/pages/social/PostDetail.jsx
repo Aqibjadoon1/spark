@@ -10,16 +10,18 @@ import { timeAgo } from '../../utils/timestampUtils';
 import { formatNumber, linkifyText } from '../../utils/formatUtils';
 import { showToast } from '../../redux/actions/uiActions';
 import { trackComment } from '../../services/analyticsService';
+import { createNotification } from '../../services/notificationService';
 import Avatar from '../../components/globals/Avatar';
 import CommentForm from '../../components/forms/CommentForm';
 import Skeleton from '../../components/globals/Skeleton';
 import EmptyState from '../../components/feedback/EmptyState';
+import useUserReactions from '../../hooks/useUserReactions';
 
 const PostDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const reduxDispatch = useDispatch();
-  const { currentPost, loading, error, getPostById, reactToPost, deletePost, incrementViews } = usePosts();
+  const { currentPost, loading, error, getPostById, reactToPost, removeReaction, deletePost, incrementViews } = usePosts();
   const { user } = useAuth();
 
   const [comments, setComments] = useState([]);
@@ -27,18 +29,30 @@ const PostDetail = () => {
   const [submittingComment, setSubmittingComment] = useState(false);
   const [post, setPost] = useState(null);
   const [pageLoading, setPageLoading] = useState(true);
+  const { hasReacted, toggleReaction } = useUserReactions(user?.uid);
 
   useEffect(() => {
     document.title = post ? `${post.title} - Spark` : 'Post - Spark';
   }, [post]);
 
+  const [collectionName, setCollectionName] = useState(null);
+
   useEffect(() => {
     const loadPost = async () => {
       setPageLoading(true);
       try {
-        const fetched = await getPostById(id);
-        setPost(fetched);
-        incrementViews(id);
+        let col = COLLECTIONS.POSTS;
+        let fetched = await getPostById(id, col);
+        if (!fetched) {
+          col = COLLECTIONS.DUMMY_POSTS;
+          fetched = await getPostById(id, col);
+        }
+        if (fetched) {
+          fetched._collection = col;
+          setCollectionName(col);
+          setPost(fetched);
+          incrementViews(id, col);
+        }
       } catch {
       } finally {
         setPageLoading(false);
@@ -48,9 +62,9 @@ const PostDetail = () => {
   }, [id, getPostById, incrementViews]);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id || !collectionName) return;
     setCommentsLoading(true);
-    const commentsRef = collection(db, COLLECTIONS.POSTS, id, 'comments');
+    const commentsRef = collection(db, collectionName, id, 'comments');
     const q = query(commentsRef, orderBy('createdAt', 'asc'));
     const unsubscribe = onSnapshot(
       q,
@@ -67,7 +81,7 @@ const PostDetail = () => {
       },
     );
     return () => unsubscribe();
-  }, [id]);
+  }, [id, collectionName]);
 
   useEffect(() => {
     if (currentPost) setPost(currentPost);
@@ -79,14 +93,33 @@ const PostDetail = () => {
         reduxDispatch(showToast('Sign in to react', 'warning'));
         return;
       }
+      const isReacted = hasReacted(id, emoji);
+      toggleReaction(id, emoji);
       try {
-        await reactToPost(id, emoji);
-        reduxDispatch(showToast('Reaction added', 'success'));
+        if (isReacted) {
+          await removeReaction(id, emoji, collectionName);
+          reduxDispatch(showToast('Reaction removed', 'success'));
+        } else {
+          await reactToPost(id, emoji, collectionName);
+          if (post?.authorId && post.authorId !== user?.uid) {
+            createNotification({
+              userId: post.authorId,
+              type: 'like',
+              fromUserId: user.uid,
+              fromUserName: user.displayName,
+              fromUserPhoto: user.photoURL || '',
+              targetId: id,
+              targetType: 'post',
+              message: 'liked your post',
+            }).catch(() => {});
+          }
+          reduxDispatch(showToast('Reaction added', 'success'));
+        }
       } catch {
-        reduxDispatch(showToast('Failed to add reaction', 'error'));
+        reduxDispatch(showToast('Failed to update reaction', 'error'));
       }
     },
-    [id, user, reactToPost, reduxDispatch],
+    [id, collectionName, user, hasReacted, toggleReaction, reactToPost, removeReaction, reduxDispatch, post?.authorId],
   );
 
   const { addComment } = usePosts();
@@ -104,7 +137,19 @@ const PostDetail = () => {
           authorName: user.displayName || 'Anonymous',
           authorPhoto: user.photoURL || '',
           content,
-        });
+        }, collectionName);
+        if (post?.authorId && post.authorId !== user?.uid) {
+          createNotification({
+            userId: post.authorId,
+            type: 'comment',
+            fromUserId: user.uid,
+            fromUserName: user.displayName || 'Anonymous',
+            fromUserPhoto: user.photoURL || '',
+            targetId: id,
+            targetType: 'post',
+            message: `commented: "${content.slice(0, 60)}"`,
+          }).catch(() => {});
+        }
         reduxDispatch(showToast('Comment added', 'success'));
         trackComment();
       } catch {
@@ -113,19 +158,19 @@ const PostDetail = () => {
         setSubmittingComment(false);
       }
     },
-    [id, user, addComment, reduxDispatch],
+    [id, collectionName, user, addComment, reduxDispatch, post?.authorId],
   );
 
   const handleDelete = useCallback(async () => {
     if (!window.confirm('Delete this post permanently?')) return;
     try {
-      await deletePost(id);
+      await deletePost(id, collectionName);
       reduxDispatch(showToast('Post deleted', 'success'));
       navigate(-1);
     } catch {
       reduxDispatch(showToast('Failed to delete post', 'error'));
     }
-  }, [id, deletePost, reduxDispatch, navigate]);
+  }, [id, collectionName, deletePost, reduxDispatch, navigate]);
 
   if (pageLoading || loading) {
     return (
@@ -243,7 +288,7 @@ const PostDetail = () => {
             <button
               key={emoji}
               onClick={() => handleReact(emoji)}
-              className="post-action-btn"
+              className={`post-action-btn${hasReacted(id, emoji) ? ' active' : ''}`}
               aria-label={`React with ${emoji}`}
             >
               <span>{emoji}</span>
@@ -256,41 +301,40 @@ const PostDetail = () => {
         </div>
       </div>
 
-      <section style={{ marginTop: 32 }}>
-        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 24 }}>
+      <section className="post-comments-section">
+        <h2 className="post-comments-heading">
           Comments ({comments.length})
         </h2>
 
         <div className="panel-card">
           <CommentForm onSubmit={handleComment} isLoading={submittingComment} />
 
-          <div style={{ marginTop: 24 }}>
+          <div className="post-comments-list">
             {commentsLoading ? (
-              <div style={{ marginBottom: 16 }}>
+              <div className="post-comments-skeleton">
                 <Skeleton variant="text" count={3} />
               </div>
             ) : comments.length === 0 ? (
-              <p style={{ textAlign: 'center', fontSize: 14, padding: '24px 0', opacity: 0.6 }}>
+              <p className="post-comments-empty">
                 No comments yet. Be the first to share your thoughts!
               </p>
             ) : (
               comments.map((comment) => (
-                <div key={comment.id} style={{ display: 'flex', gap: 16, padding: '16px 0', borderTop: '1px solid var(--border-light)' }}>
+                <div key={comment.id} className="post-comment-item">
                   <Avatar src={comment.authorPhoto} name={comment.authorName} size="sm" />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                  <div className="post-comment-content">
+                    <div className="post-comment-header">
                       <button
                         onClick={() => navigate(`/profile/${comment.authorId}`)}
-                        className="post-author-name"
-                        style={{ fontSize: 13 }}
+                        className="post-comment-author"
                       >
                         {comment.authorName || 'Anonymous'}
                       </button>
-                      <span className="post-timestamp" style={{ fontSize: 12 }}>
+                      <span className="post-comment-time">
                         {timeAgo(comment.createdAt)}
                       </span>
                     </div>
-                    <p style={{ fontSize: 14, opacity: 0.7 }}>{comment.content}</p>
+                    <p className="post-comment-text">{comment.content}</p>
                   </div>
                 </div>
               ))

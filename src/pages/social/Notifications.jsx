@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import useAuth from '../../hooks/useAuth';
 import { subscribeToNotifications, markNotificationRead, markAllNotificationsRead } from '../../services/notificationService';
 
@@ -18,6 +18,17 @@ const NOTIF_COLORS = {
   system: '#A15CFF',
 };
 
+const DUMMY_NOTIFICATIONS = [
+  { id: 'dummy-notif-1', type: 'like', fromUserName: 'Sarah Chen', fromUserPhoto: '', targetId: '', targetType: 'post', message: 'liked your post', createdAt: { toMillis: () => Date.now() - 2 * 3600000 }, read: false, _dummy: true },
+  { id: 'dummy-notif-2', type: 'follow', fromUserName: 'Marcus Johnson', fromUserPhoto: '', targetId: '', targetType: '', message: 'started following you', createdAt: { toMillis: () => Date.now() - 5 * 3600000 }, read: false, _dummy: true },
+  { id: 'dummy-notif-3', type: 'comment', fromUserName: 'Emily Watson', fromUserPhoto: '', targetId: '', targetType: 'post', message: 'commented on your post: "Great insights!"', createdAt: { toMillis: () => Date.now() - 8 * 3600000 }, read: true, _dummy: true },
+  { id: 'dummy-notif-4', type: 'mention', fromUserName: 'David Kim', fromUserPhoto: '', targetId: '', targetType: 'comment', message: 'mentioned you in a comment', createdAt: { toMillis: () => Date.now() - 24 * 3600000 }, read: true, _dummy: true },
+  { id: 'dummy-notif-5', type: 'like', fromUserName: 'Alex Rivera', fromUserPhoto: '', targetId: '', targetType: 'post', message: 'liked your post', createdAt: { toMillis: () => Date.now() - 30 * 3600000 }, read: true, _dummy: true },
+  { id: 'dummy-notif-6', type: 'system', fromUserName: 'Spark', fromUserPhoto: '', targetId: '', targetType: '', message: 'Welcome to Spark! Complete your profile to get started.', createdAt: { toMillis: () => Date.now() - 72 * 3600000 }, read: true, _dummy: true },
+  { id: 'dummy-notif-7', type: 'follow', fromUserName: 'Lisa Park', fromUserPhoto: '', targetId: '', targetType: '', message: 'started following you', createdAt: { toMillis: () => Date.now() - 80 * 3600000 }, read: true, _dummy: true },
+  { id: 'dummy-notif-8', type: 'comment', fromUserName: 'James Wilson', fromUserPhoto: '', targetId: '', targetType: 'post', message: 'commented: "This is exactly what I needed"', createdAt: { toMillis: () => Date.now() - 96 * 3600000 }, read: true, _dummy: true },
+];
+
 const formatTime = (timestamp) => {
   if (!timestamp) return '';
   const d = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
@@ -31,24 +42,48 @@ const formatTime = (timestamp) => {
 
 const Notifications = () => {
   const { user } = useAuth();
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState(DUMMY_NOTIFICATIONS);
   const [activeFilter, setActiveFilter] = useState('all');
 
   useEffect(() => { document.title = 'Notifications | Spark'; }, []);
 
   useEffect(() => {
     if (!user?.uid) return;
-    const unsub = subscribeToNotifications(user.uid, setNotifications);
+    const unsub = subscribeToNotifications(user.uid, (realNotifs) => {
+      setNotifications((prev) => {
+        const dummies = prev.filter((n) => n._dummy);
+        const merged = [...dummies, ...realNotifs].sort((a, b) => {
+          const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : a.createdAt?.toDate?.()?.getTime() || 0;
+          const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : b.createdAt?.toDate?.()?.getTime() || 0;
+          return bTime - aTime;
+        });
+        return merged;
+      });
+    }, (err) => {
+      console.warn('Notifications subscription failed, showing dummy data', err);
+    });
     return () => unsub();
   }, [user?.uid]);
 
-  const filtered = activeFilter === 'all'
-    ? notifications
-    : notifications.filter((n) => n.type === activeFilter);
+  const filtered = useMemo(() => {
+    const list = activeFilter === 'all' ? notifications : notifications.filter((n) => n.type === activeFilter);
+    return list;
+  }, [notifications, activeFilter]);
 
   const unreadAll = notifications.filter((n) => !n.read).length;
+  const countsByType = useMemo(() => {
+    const c = {};
+    notifications.forEach((n) => {
+      const t = n.type || 'all';
+      c[t] = (c[t] || 0) + 1;
+      if (!n.read) c[`${t}_unread`] = (c[`${t}_unread`] || 0) + 1;
+    });
+    return c;
+  }, [notifications]);
 
   const handleMarkRead = async (id) => {
+    const notif = notifications.find((n) => n.id === id);
+    if (notif?._dummy) return;
     try { await markNotificationRead(id); } catch {}
   };
 
@@ -64,20 +99,36 @@ const Notifications = () => {
       </div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
-        {['all', 'like', 'follow', 'comment', 'mention', 'system'].map((type) => (
-          <button
-            key={type}
-            onClick={() => setActiveFilter(type)}
-            style={{
-              padding: '6px 14px', borderRadius: 20, border: '1px solid var(--border-light)',
-              background: activeFilter === type ? 'linear-gradient(135deg, #7B4DFF, #FF3C9D)' : 'var(--bg-glass)',
-              color: activeFilter === type ? '#fff' : 'var(--color-text-primary)',
-              fontSize: 12, fontWeight: 600, cursor: 'pointer',
-            }}
-          >
-            {type === 'all' ? `All (${unreadAll})` : type.charAt(0).toUpperCase() + type.slice(1)}
-          </button>
-        ))}
+        {['all', 'like', 'follow', 'comment', 'mention', 'system'].map((type) => {
+          const total = type === 'all' ? notifications.length : (countsByType[type] || 0);
+          const unread = type === 'all' ? unreadAll : (countsByType[`${type}_unread`] || 0);
+          return (
+            <button
+              key={type}
+              onClick={() => setActiveFilter(type)}
+              style={{
+                padding: '6px 14px', borderRadius: 20, border: activeFilter === type ? '1px solid transparent' : '1px solid var(--border-light)',
+                background: activeFilter === type ? 'linear-gradient(135deg, #7B4DFF, #FF3C9D)' : 'var(--bg-glass)',
+                color: activeFilter === type ? '#fff' : 'var(--color-text-primary)',
+                fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                boxShadow: activeFilter === type ? '0 2px 8px rgba(123,77,255,0.3)' : 'none',
+                transition: 'all 0.2s',
+              }}
+            >
+              {type === 'all' ? 'All' : type.charAt(0).toUpperCase() + type.slice(1)}
+              {unread > 0 && (
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  marginLeft: 6, minWidth: 18, height: 18, borderRadius: 9,
+                  background: activeFilter === type ? 'rgba(255,255,255,0.25)' : 'var(--color-primary-light)',
+                  fontSize: 10, fontWeight: 700, padding: '0 4px',
+                }}>
+                  {unread}
+                </span>
+              )}
+            </button>
+          );
+        })}
         {unreadAll > 0 && (
           <button onClick={handleMarkAllRead} style={{ marginLeft: 'auto', padding: '6px 14px', borderRadius: 20, border: '1px solid var(--border-light)', background: 'var(--bg-glass)', color: 'var(--color-text-primary)', fontSize: 12, cursor: 'pointer' }}>
             Mark all read
@@ -85,42 +136,43 @@ const Notifications = () => {
         )}
       </div>
 
-      {filtered.map((n) => (
-        <div
-          key={n.id}
-          onClick={() => { if (!n.read) handleMarkRead(n.id); }}
-          className="feed-post-wrapper"
-          style={{
-            padding: '16px 20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14,
-            opacity: n.read ? 0.6 : 1,
-          }}
-        >
-          <div style={{
-            width: 40, height: 40, borderRadius: '50%',
-            background: `linear-gradient(135deg, ${NOTIF_COLORS[n.type] || '#7B4DFF'}, var(--border-medium))`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            fontSize: 13, fontWeight: 700, color: 'var(--color-text-white)',
-          }}>
-            {(n.fromUserName || '?').charAt(0).toUpperCase()}
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontSize: 14, color: 'var(--color-text-primary)', lineHeight: 1.4 }}>
-              <strong style={{ color: 'var(--color-text-primary)' }}>{n.fromUserName}</strong>{' '}{n.message}
-            </p>
-            <span style={{ fontSize: 12, color: 'var(--color-text-placeholder)', marginTop: 2, display: 'block' }}>
-              {formatTime(n.createdAt)}
-            </span>
-          </div>
-          <div style={{
-            width: 36, height: 36, borderRadius: 10, background: 'var(--bg-glass)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          }}>
-            {iconMap[n.type]}
-          </div>
-        </div>
-      ))}
-      {filtered.length === 0 && (
+      {filtered.length === 0 ? (
         <p style={{ color: 'var(--color-text-placeholder)', textAlign: 'center', padding: 40 }}>No notifications yet</p>
+      ) : (
+        filtered.map((n) => (
+          <div
+            key={n.id}
+            onClick={() => { if (!n.read) handleMarkRead(n.id); }}
+            className="feed-post-wrapper"
+            style={{
+              padding: '16px 20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14,
+              opacity: n.read ? 0.6 : 1,
+            }}
+          >
+            <div style={{
+              width: 40, height: 40, borderRadius: '50%',
+              background: `linear-gradient(135deg, ${NOTIF_COLORS[n.type] || '#7B4DFF'}, var(--border-medium))`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              fontSize: 13, fontWeight: 700, color: 'var(--color-text-white)',
+            }}>
+              {(n.fromUserName || '?').charAt(0).toUpperCase()}
+            </div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontSize: 14, color: 'var(--color-text-primary)', lineHeight: 1.4 }}>
+                <strong style={{ color: 'var(--color-text-primary)' }}>{n.fromUserName}</strong>{' '}{n.message}
+              </p>
+              <span style={{ fontSize: 12, color: 'var(--color-text-placeholder)', marginTop: 2, display: 'block' }}>
+                {formatTime(n.createdAt)}
+              </span>
+            </div>
+            <div style={{
+              width: 36, height: 36, borderRadius: 10, background: 'var(--bg-glass)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}>
+              {iconMap[n.type]}
+            </div>
+          </div>
+        ))
       )}
     </div>
   );

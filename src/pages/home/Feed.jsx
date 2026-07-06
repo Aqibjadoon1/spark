@@ -7,6 +7,7 @@ import PostCard from '../../components/cards/PostCard';
 import PostForm from '../../components/forms/PostForm';
 import { uploadPostImage } from '../../services/storageService';
 import { trackPostCreated } from '../../services/analyticsService';
+import { createNotification } from '../../services/notificationService';
 import Skeleton from '../../components/globals/Skeleton';
 
 
@@ -17,7 +18,6 @@ const Feed = () => {
   const { posts, loading, error, createPost, updatePost, deletePost, reactToPost, removeReaction, addComment } = usePosts();
 
   const [creating, setCreating] = useState(false);
-  const [localReactions, setLocalReactions] = useState({});
   const [localComments, setLocalComments] = useState({});
   const [sortBy, setSortBy] = useState('newest');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -72,37 +72,59 @@ const Feed = () => {
     }
   };
 
+  const getCollection = (postId) => posts.find(p => p.id === postId)?._collection;
+
   const handleDelete = async (id) => {
     try {
-      await deletePost(id);
+      await deletePost(id, getCollection(id));
       dispatch(showToast('Post deleted', 'success'));
     } catch (err) {
       dispatch(showToast(err.message, 'error'));
     }
   };
 
-  const handleReact = async (id, emoji, isRemove) => {
+  const handleReact = async (id, emoji, authorId, isRemove) => {
+    const col = getCollection(id);
     if (isRemove) {
-      setLocalReactions(prev => {
-        const existing = prev[id] ? { ...prev[id] } : {};
-        existing[emoji] = Math.max(0, (existing[emoji] || 0) - 1);
-        return { ...prev, [id]: existing };
-      });
-      try { await removeReaction(id, emoji); } catch (err) {}
+      try { await removeReaction(id, emoji, col); } catch (err) {}
     } else {
-      setLocalReactions(prev => {
-        const existing = prev[id] ? { ...prev[id] } : {};
-        existing[emoji] = (existing[emoji] || 0) + 1;
-        return { ...prev, [id]: existing };
-      });
-      try { await reactToPost(id, emoji); } catch (err) {}
+      try {
+        await reactToPost(id, emoji, col);
+        if (authorId && authorId !== user?.uid) {
+          createNotification({
+            userId: authorId,
+            type: 'like',
+            fromUserId: user?.uid,
+            fromUserName: user?.displayName || user?.name,
+            fromUserPhoto: user?.photoURL || '',
+            targetId: id,
+            targetType: 'post',
+            message: 'liked your post',
+          }).catch(() => {});
+        }
+      } catch (err) {}
     }
   };
 
-  const handleAddComment = (postId, text) => {
+  const handleAddComment = (postId, text, authorId) => {
+    const col = getCollection(postId);
     const comment = { id: Date.now().toString(), author: user?.displayName || user?.name || 'You', authorId: user?.uid, text, time: new Date().toISOString() };
     setLocalComments(prev => ({ ...prev, [postId]: [...(prev[postId] || []), comment] }));
-    try { addComment(postId, { authorName: user?.displayName || user?.name || 'Anonymous', authorId: user?.uid, authorPhoto: user?.photoURL || '', content: text }); } catch (err) {}
+    try {
+      addComment(postId, { authorName: user?.displayName || user?.name || 'Anonymous', authorId: user?.uid, authorPhoto: user?.photoURL || '', content: text }, col);
+      if (authorId && authorId !== user?.uid) {
+        createNotification({
+          userId: authorId,
+          type: 'comment',
+          fromUserId: user?.uid,
+          fromUserName: user?.displayName || user?.name,
+          fromUserPhoto: user?.photoURL || '',
+          targetId: postId,
+          targetType: 'post',
+          message: `commented: "${text.slice(0, 60)}"`,
+        }).catch(() => {});
+      }
+    } catch (err) {}
   };
 
   return (
@@ -150,7 +172,6 @@ const Feed = () => {
             <div className="feed-post-wrapper" key={post.id}>
               <PostCard
                 post={post}
-                localReactions={localReactions[post.id]}
                 localComments={localComments[post.id]}
                 onReact={handleReact}
                 onDelete={handleDelete}

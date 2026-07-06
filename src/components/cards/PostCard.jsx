@@ -3,12 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { timeAgo } from '../../utils/timestampUtils';
 import { truncateText, formatNumber, linkifyText } from '../../utils/formatUtils';
 import Avatar from '../globals/Avatar';
+import useUserReactions from '../../hooks/useUserReactions';
 
-const PostCard = ({ post, localReactions, localComments, onReact, onComment, onAddComment, onDelete, onEdit, currentUserId }) => {
+const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDelete, onEdit, currentUserId }) => {
   const navigate = useNavigate();
+  const { hasReacted, toggleReaction } = useUserReactions(currentUserId);
   const [showComments, setShowComments] = useState(false);
   const [commentInput, setCommentInput] = useState('');
-  const [myReactions, setMyReactions] = useState(new Set());
 
   if (!post) return null;
 
@@ -20,8 +21,7 @@ const PostCard = ({ post, localReactions, localComments, onReact, onComment, onA
     image,
   } = post;
 
-  const mergedReactions = { ...postReactions, ...(localReactions || {}) };
-  const totalReactions = Object.values(mergedReactions).reduce((a, b) => a + b, 0);
+  const totalReactions = Object.values(postReactions).reduce((a, b) => a + b, 0);
   const comments = localComments || [];
   const isAuthor = currentUserId && currentUserId === authorId;
   const reactionEmojis = ['❤️', '🔥', '👍'];
@@ -40,7 +40,7 @@ const PostCard = ({ post, localReactions, localComments, onReact, onComment, onA
 
   const handleSendComment = () => {
     if (!commentInput.trim()) return;
-    onAddComment?.(id, commentInput.trim());
+    onAddComment?.(id, commentInput.trim(), authorId);
     setCommentInput('');
   };
 
@@ -53,13 +53,12 @@ const PostCard = ({ post, localReactions, localComments, onReact, onComment, onA
 
   const handleReactClick = (e, emoji) => {
     e.stopPropagation();
-    const isReacted = myReactions.has(emoji);
+    const isReacted = hasReacted(id, emoji);
+    toggleReaction(id, emoji);
     if (isReacted) {
-      setMyReactions((prev) => { const next = new Set(prev); next.delete(emoji); return next; });
-      onReact?.(id, emoji, true);
+      onReact?.(id, emoji, authorId, true);
     } else {
-      setMyReactions((prev) => new Set(prev).add(emoji));
-      onReact?.(id, emoji);
+      onReact?.(id, emoji, authorId);
     }
   };
 
@@ -104,22 +103,22 @@ const PostCard = ({ post, localReactions, localComments, onReact, onComment, onA
           <button
             key={emoji}
             onClick={(e) => handleReactClick(e, emoji)}
-            className={`pc-reaction-btn${myReactions.has(emoji) ? ' active' : ''}`}
+            className={`pc-reaction-btn${hasReacted(id, emoji) ? ' active' : ''}`}
             aria-label={`React with ${emoji}`}
-            style={myReactions.has(emoji) ? { background: 'rgba(123,77,255,0.15)', borderColor: 'rgba(123,77,255,0.35)' } : {}}
+            style={hasReacted(id, emoji) ? { background: 'rgba(123,77,255,0.15)', borderColor: 'rgba(123,77,255,0.35)' } : {}}
           >
             <span className="pc-reaction-emoji">{emoji}</span>
-            <span className="pc-reaction-count">{formatNumber(mergedReactions[emoji] || 0)}</span>
+            <span className="pc-reaction-count">{formatNumber(postReactions[emoji] || 0)}</span>
           </button>
         ))}
         <button onClick={(e) => { e.stopPropagation(); onComment?.(id); }} className="pc-reaction-btn pc-reaction-btn--right" aria-label="View post detail">
-          💬 <span className="pc-reaction-count">{formatNumber(comments.length + (post.commentCount || 0))}</span>
+          💬 <span className="pc-reaction-count">{formatNumber(post.commentsCount || 0)}</span>
         </button>
       </div>
 
       <div className="pc-stats-bar">
         <span className="pc-stat">{formatNumber(totalReactions)} reactions</span>
-        <span className="pc-stat">{formatNumber(comments.length + (post.commentCount || 0))} comments</span>
+        <span className="pc-stat">{formatNumber(post.commentsCount || 0)} comments</span>
       </div>
 
       <div className="pc-actions-bar">
@@ -133,15 +132,17 @@ const PostCard = ({ post, localReactions, localComments, onReact, onComment, onA
 
       {showComments && (
         <div className="pc-comments-section" onClick={(e) => e.stopPropagation()}>
-          {comments.map((c) => (
-            <div key={c.id} className="pc-comment">
-              <div className="pc-comment-avatar">{c.author?.charAt(0) || '?'}</div>
-              <div className="pc-comment-body">
-                <span className="pc-comment-author">{c.author}</span>
-                <p className="pc-comment-text">{c.text}</p>
+          <div className="pc-comments-list">
+            {comments.map((c) => (
+              <div key={c.id} className="pc-comment">
+                <div className="pc-comment-avatar">{c.author?.charAt(0) || '?'}</div>
+                <div className="pc-comment-body">
+                  <span className="pc-comment-author">{c.author}</span>
+                  <p className="pc-comment-text">{c.text}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
           <div className="pc-comment-input-row">
             <input
               type="text"

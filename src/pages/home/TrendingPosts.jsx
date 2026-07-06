@@ -5,16 +5,9 @@ import usePosts from '../../hooks/usePosts';
 import useAuth from '../../hooks/useAuth';
 import { showToast } from '../../redux/actions/uiActions';
 import PostCard from '../../components/cards/PostCard';
+import { createNotification } from '../../services/notificationService';
 import Skeleton from '../../components/globals/Skeleton';
 import EmptyState from '../../components/feedback/EmptyState';
-
-const dummyPosts = [
-  { id: 'explore-dummy-1', authorId: 'dummy', authorName: 'Sarah Chen', authorPhoto: null, category: 'technology', title: 'The Future of AI in Web Development', content: 'AI is transforming how we build for the web. From intelligent code completion to automated accessibility audits, the tools we use are becoming smarter by the day.', tags: ['ai', 'webdev', 'future'], reactions: { '❤️': 142, '🔥': 88, '👍': 112 }, reactionCount: 342, viewCount: 1284, commentCount: 28, createdAt: { toMillis: () => Date.now() - 3 * 3600000 } },
-  { id: 'explore-dummy-2', authorId: 'dummy', authorName: 'Marcus Johnson', authorPhoto: null, category: 'technology', title: 'Rust for Frontend Devs in 2026', content: 'After spending six months with Rust, I can confidently say it\'s worth the hype. The type system catches bugs that would slip through in JavaScript.', tags: ['rust', 'wasm', 'frontend'], reactions: { '❤️': 96, '🔥': 120, '👍': 40 }, reactionCount: 256, viewCount: 972, commentCount: 31, createdAt: { toMillis: () => Date.now() - 5 * 3600000 } },
-  { id: 'explore-dummy-3', authorId: 'dummy', authorName: 'Emily Watson', authorPhoto: null, category: 'technology', title: 'CSS Container Queries Are Finally Here', content: 'Container queries solve one of the biggest pain points in responsive design. Components can now adapt to their parent container.', tags: ['css', 'responsive', 'design'], reactions: { '❤️': 72, '🔥': 45, '👍': 72 }, reactionCount: 189, viewCount: 845, commentCount: 14, createdAt: { toMillis: () => Date.now() - 8 * 3600000 } },
-  { id: 'explore-dummy-4', authorId: 'dummy', authorName: 'David Kim', authorPhoto: null, category: 'technology', title: 'Building a Design System with React', content: 'A design system is more than a component library — it\'s a shared language between design and engineering.', tags: ['design-system', 'react', 'frontend'], reactions: { '❤️': 88, '🔥': 34, '👍': 45 }, reactionCount: 167, viewCount: 703, commentCount: 19, createdAt: { toMillis: () => Date.now() - 12 * 3600000 } },
-  { id: 'explore-dummy-5', authorId: 'dummy', authorName: 'Alex Rivera', authorPhoto: null, category: 'technology', title: 'Why Edge Computing Matters Now', content: 'Edge computing isn\'t just about latency — it\'s about where your code runs.', tags: ['edge', 'cloud', 'performance'], reactions: { '❤️': 54, '🔥': 28, '👍': 52 }, reactionCount: 134, viewCount: 612, commentCount: 11, createdAt: { toMillis: () => Date.now() - 24 * 3600000 } },
-];
 
 const sortOptions = [
   { value: 'trending', label: 'Trending' },
@@ -31,15 +24,13 @@ const ExplorePosts = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('trending');
   const [categoryFilter, setCategoryFilter] = useState('');
-  const [localReactions, setLocalReactions] = useState({});
   const [localComments, setLocalComments] = useState({});
 
   useEffect(() => { document.title = 'Explore | Spark'; }, []);
   useEffect(() => { if (error) dispatch(showToast(error, 'error')); }, [error, dispatch]);
 
   const allPosts = useMemo(() => {
-    const combined = [...dummyPosts, ...posts];
-    let filtered = combined.filter((p) => {
+    let filtered = posts.filter((p) => {
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
         if (!p.title?.toLowerCase().includes(q) &&
@@ -64,37 +55,59 @@ const ExplorePosts = () => {
     return filtered;
   }, [posts, searchQuery, sortBy, categoryFilter]);
 
-  const handleReact = async (id, emoji, isRemove) => {
+  const getCollection = (postId) => posts.find(p => p.id === postId)?._collection;
+
+  const handleReact = async (id, emoji, authorId, isRemove) => {
+    const col = getCollection(id);
     if (isRemove) {
-      setLocalReactions(prev => {
-        const existing = prev[id] ? { ...prev[id] } : {};
-        existing[emoji] = Math.max(0, (existing[emoji] || 0) - 1);
-        return { ...prev, [id]: existing };
-      });
-      try { await removeReaction(id, emoji); } catch {}
+      try { await removeReaction(id, emoji, col); } catch {}
     } else {
-      setLocalReactions(prev => {
-        const existing = prev[id] ? { ...prev[id] } : {};
-        existing[emoji] = (existing[emoji] || 0) + 1;
-        return { ...prev, [id]: existing };
-      });
-      try { await reactToPost(id, emoji); } catch {}
+      try {
+        await reactToPost(id, emoji, col);
+        if (authorId && authorId !== user?.uid) {
+          createNotification({
+            userId: authorId,
+            type: 'like',
+            fromUserId: user?.uid,
+            fromUserName: user?.displayName,
+            fromUserPhoto: user?.photoURL || '',
+            targetId: id,
+            targetType: 'post',
+            message: 'liked your post',
+          }).catch(() => {});
+        }
+      } catch {}
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await deletePost(id);
+      await deletePost(id, getCollection(id));
       dispatch(showToast('Post deleted', 'success'));
     } catch (err) {
       dispatch(showToast(err.message, 'error'));
     }
   };
 
-  const handleAddComment = (postId, text) => {
+  const handleAddComment = (postId, text, authorId) => {
+    const col = getCollection(postId);
     const comment = { id: Date.now().toString(), author: user?.displayName || 'You', authorId: user?.uid, text, time: new Date().toISOString() };
     setLocalComments(prev => ({ ...prev, [postId]: [...(prev[postId] || []), comment] }));
-    try { addComment(postId, { authorName: user?.displayName || 'Anonymous', authorId: user?.uid, authorPhoto: user?.photoURL || '', content: text }); } catch {}
+    try {
+      addComment(postId, { authorName: user?.displayName || 'Anonymous', authorId: user?.uid, authorPhoto: user?.photoURL || '', content: text }, col);
+      if (authorId && authorId !== user?.uid) {
+        createNotification({
+          userId: authorId,
+          type: 'comment',
+          fromUserId: user?.uid,
+          fromUserName: user?.displayName,
+          fromUserPhoto: user?.photoURL || '',
+          targetId: postId,
+          targetType: 'post',
+          message: `commented: "${text.slice(0, 60)}"`,
+        }).catch(() => {});
+      }
+    } catch {}
   };
 
   return (
@@ -166,7 +179,6 @@ const ExplorePosts = () => {
             <div className="feed-post-wrapper" key={post.id}>
               <PostCard
                 post={post}
-                localReactions={localReactions[post.id]}
                 localComments={localComments[post.id]}
                 onReact={handleReact}
                 onDelete={handleDelete}
