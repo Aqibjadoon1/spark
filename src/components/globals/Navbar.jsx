@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from '../../redux/actions/authActions';
 import ThemeToggle from '../ui/ThemeToggle';
-import logoSrc from '../../assets/logo/icons8-logo-100.png';
+import logoSrc from '../../assets/new/web/icons8-logo-outline-hand-drawn-32.png';
 
 const Navbar = memo(({ onToggleSidebar }) => {
   const [profileOpen, setProfileOpen] = useState(false);

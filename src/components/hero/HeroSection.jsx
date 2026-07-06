@@ -5,7 +5,7 @@ import GlowLayer from './GlowLayer';
 import FloatingCards from './FloatingCards';
 import HeroContent from './HeroContent';
 import ThemeToggle from '../ui/ThemeToggle';
-import logoSrc from '../../assets/logo/icons8-logo-100.png';
+import logoSrc from '../../assets/new/web/icons8-logo-outline-hand-drawn-96.png';
 
 const HeroSection = () => (
   <section className="hero-section">
