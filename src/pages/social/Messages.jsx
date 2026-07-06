@@ -36,7 +36,7 @@ const Messages = () => {
     return map;
   }, [users]);
 
-  useEffect(() => { document.title = 'Messages | Spark'; }, []);
+  useEffect(() => { document.title = 'Messages | Elite Social'; }, []);
 
   useEffect(() => {
     if (!user?.uid) return;

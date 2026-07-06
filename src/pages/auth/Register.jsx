@@ -21,7 +21,7 @@ const Register = () => {
   const [agreeTerms, setAgreeTerms] = useState(false);
 
   useEffect(() => {
-    document.title = 'Create Account | Spark';
+    document.title = 'Create Account | Elite Social';
   }, []);
 
   useEffect(() => {

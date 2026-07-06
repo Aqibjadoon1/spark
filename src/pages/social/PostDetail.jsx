@@ -32,7 +32,7 @@ const PostDetail = () => {
   const { hasReacted, toggleReaction } = useUserReactions(user?.uid);
 
   useEffect(() => {
-    document.title = post ? `${post.title} - Spark` : 'Post - Spark';
+    document.title = post ? `${post.title} - Elite Social` : 'Post - Elite Social';
   }, [post]);
 
   const [collectionName, setCollectionName] = useState(null);

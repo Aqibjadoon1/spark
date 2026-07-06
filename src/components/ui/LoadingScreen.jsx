@@ -84,7 +84,7 @@ const LoadingScreen = ({ children }) => {
               animation: 'floatGlow 3s ease-in-out infinite',
             }}
           >
-            SPARK
+            Elite Social
           </h1>
         </div>
 

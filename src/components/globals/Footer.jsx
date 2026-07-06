@@ -46,7 +46,7 @@ const Footer = () => {
       <div className="app-footer-inner">
         <div className="app-footer-grid">
           <div className="app-footer-brand-col">
-            <span className="app-footer-logo">SPARK</span>
+            <span className="app-footer-logo">Elite Social</span>
             <p className="app-footer-desc">
               Connect, share, and discover what matters. The social network built for meaningful interactions.
             </p>
@@ -79,7 +79,7 @@ const Footer = () => {
       </div>
       <div className="app-footer-bottom">
         <p className="app-footer-copy">
-          &copy; {new Date().getFullYear()} Spark. All rights reserved.
+          &copy; {new Date().getFullYear()} Elite Social. All rights reserved.
         </p>
       </div>
     </footer>

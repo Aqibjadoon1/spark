@@ -26,7 +26,7 @@ const Settings = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
-    document.title = 'Settings - Spark';
+    document.title = 'Settings - Elite Social';
   }, []);
 
   useEffect(() => {

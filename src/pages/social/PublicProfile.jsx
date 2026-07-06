@@ -27,7 +27,7 @@ const PublicProfile = () => {
   const [requestSent, setRequestSent] = useState(false);
 
   useEffect(() => {
-    document.title = profileUser ? `${profileUser.displayName} - Spark` : 'Profile - Spark';
+    document.title = profileUser ? `${profileUser.displayName} - Elite Social` : 'Profile - Elite Social';
   }, [profileUser]);
 
   useEffect(() => {

@@ -22,7 +22,7 @@ const Feed = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [categoryFilter, setCategoryFilter] = useState('');
 
-  useEffect(() => { document.title = 'Feed | Spark'; }, []);
+  useEffect(() => { document.title = 'Feed | Elite Social'; }, []);
 
   useEffect(() => {
     if (error) dispatch(showToast(error, 'error'));

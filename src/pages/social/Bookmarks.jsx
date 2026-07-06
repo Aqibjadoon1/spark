@@ -11,7 +11,7 @@ const dummyBookmarks = [
 const gradientColors = ['#7B4DFF,#A15CFF', '#FF3C9D,#FF6B6B', '#4A6CFF,#7B4DFF', '#A15CFF,#FF3C9D', '#00C9B1,#4A6CFF'];
 
 const Bookmarks = () => {
-  useEffect(() => { document.title = 'Bookmarks | Spark'; }, []);
+  useEffect(() => { document.title = 'Bookmarks | Elite Social'; }, []);
 
   return (
     <div className="feed">

@@ -23,7 +23,7 @@ const Friends = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [emailInput, setEmailInput] = useState('');
 
-  useEffect(() => { document.title = 'Friends | Spark'; }, []);
+  useEffect(() => { document.title = 'Friends | Elite Social'; }, []);
 
   const userMap = useMemo(() => {
     const map = {};

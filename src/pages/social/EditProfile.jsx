@@ -22,7 +22,7 @@ const EditProfile = () => {
   const fileInputRef = useRef(null);
 
   useEffect(() => {
-    document.title = 'Edit Profile - Spark';
+    document.title = 'Edit Profile - Elite Social';
   }, []);
 
   const handlePhotoChange = useCallback((e) => {

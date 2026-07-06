@@ -50,7 +50,7 @@ const NearbyFriends = () => {
   const markersLayer = useRef(null);
 
   useEffect(() => {
-    document.title = 'Nearby Friends - Spark';
+    document.title = 'Nearby Friends - Elite Social';
   }, []);
 
   useEffect(() => {

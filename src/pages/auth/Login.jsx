@@ -18,7 +18,7 @@ const Login = () => {
   const [googleLoading, setGoogleLoading] = useState(false);
 
   useEffect(() => {
-    document.title = 'Login | Spark';
+    document.title = 'Login | Elite Social';
   }, []);
 
   useEffect(() => {

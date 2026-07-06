@@ -4,7 +4,7 @@ const FloatingCards = () => (
       <div className="hero-card-header">
         <div className="hero-card-avatar">NX</div>
         <div>
-          <div className="hero-card-name">Spark Pro</div>
+          <div className="hero-card-name">Elite Social</div>
           <div className="hero-card-username">@sparkgamer</div>
         </div>
       </div>

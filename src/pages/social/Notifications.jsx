@@ -24,7 +24,7 @@ const DUMMY_NOTIFICATIONS = [
   { id: 'dummy-notif-3', type: 'comment', fromUserName: 'Emily Watson', fromUserPhoto: '', targetId: '', targetType: 'post', message: 'commented on your post: "Great insights!"', createdAt: { toMillis: () => Date.now() - 8 * 3600000 }, read: true, _dummy: true },
   { id: 'dummy-notif-4', type: 'mention', fromUserName: 'David Kim', fromUserPhoto: '', targetId: '', targetType: 'comment', message: 'mentioned you in a comment', createdAt: { toMillis: () => Date.now() - 24 * 3600000 }, read: true, _dummy: true },
   { id: 'dummy-notif-5', type: 'like', fromUserName: 'Alex Rivera', fromUserPhoto: '', targetId: '', targetType: 'post', message: 'liked your post', createdAt: { toMillis: () => Date.now() - 30 * 3600000 }, read: true, _dummy: true },
-  { id: 'dummy-notif-6', type: 'system', fromUserName: 'Spark', fromUserPhoto: '', targetId: '', targetType: '', message: 'Welcome to Spark! Complete your profile to get started.', createdAt: { toMillis: () => Date.now() - 72 * 3600000 }, read: true, _dummy: true },
+  { id: 'dummy-notif-6', type: 'system', fromUserName: 'Elite Social', fromUserPhoto: '', targetId: '', targetType: '', message: 'Welcome to Elite Social! Complete your profile to get started.', createdAt: { toMillis: () => Date.now() - 72 * 3600000 }, read: true, _dummy: true },
   { id: 'dummy-notif-7', type: 'follow', fromUserName: 'Lisa Park', fromUserPhoto: '', targetId: '', targetType: '', message: 'started following you', createdAt: { toMillis: () => Date.now() - 80 * 3600000 }, read: true, _dummy: true },
   { id: 'dummy-notif-8', type: 'comment', fromUserName: 'James Wilson', fromUserPhoto: '', targetId: '', targetType: 'post', message: 'commented: "This is exactly what I needed"', createdAt: { toMillis: () => Date.now() - 96 * 3600000 }, read: true, _dummy: true },
 ];
@@ -45,7 +45,7 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState(DUMMY_NOTIFICATIONS);
   const [activeFilter, setActiveFilter] = useState('all');
 
-  useEffect(() => { document.title = 'Notifications | Spark'; }, []);
+  useEffect(() => { document.title = 'Notifications | Elite Social'; }, []);
 
   useEffect(() => {
     if (!user?.uid) return;

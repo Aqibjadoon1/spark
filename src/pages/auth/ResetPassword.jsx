@@ -18,7 +18,7 @@ const ResetPassword = () => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    document.title = 'Reset Password | Spark';
+    document.title = 'Reset Password | Elite Social';
   }, []);
 
   useEffect(() => {

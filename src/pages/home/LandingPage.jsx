@@ -41,7 +41,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = 'Spark — Level Up Your Social Game';
+    document.title = 'Elite Social — Level Up Your Social Game';
   }, []);
 
   return (
@@ -51,9 +51,9 @@ const LandingPage = () => {
       <section className="lp-about">
         <div className="lp-about-inner">
           <span className="lp-section-tag">About</span>
-          <h2 className="lp-section-title">What is Spark?</h2>
-          <p className="lp-about-text">
-            Spark is the social platform built for gamers, creators, and competitive communities.
+          <h2 className="lp-section-title">What is Elite Social?</h2>
+          <p className="lp-section-desc">
+            Elite Social is the social platform built for gamers, creators, and competitive communities.
             Track achievements, share highlights, find your crew, and dominate the leaderboards.
             It&apos;s where your gaming identity meets social connection.
           </p>
@@ -100,7 +100,7 @@ const LandingPage = () => {
             Ready to <span style={{ color: '#B9FF66' }}>Level Up</span>?
           </h2>
           <p className="lp-cta-text">
-            Join 24,000+ gamers already building their crew on Spark.
+            Join 24,000+ gamers already building their crew on Elite Social.
           </p>
           <div className="lp-cta-actions">
             <button onClick={() => navigate(ROUTES.REGISTER)} className="lp-cta-btn">
@@ -119,8 +119,8 @@ const LandingPage = () => {
 
       <footer className="lp-footer">
         <div className="lp-footer-inner">
-          <span className="lp-footer-brand">SPARK</span>
-          <p className="lp-footer-copy">&copy; {new Date().getFullYear()} Spark. All rights reserved.</p>
+          <span className="lp-footer-brand">Elite Social</span>
+          <p className="lp-footer-copy">&copy; {new Date().getFullYear()} Elite Social. All rights reserved.</p>
         </div>
       </footer>
     </div>

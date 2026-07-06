@@ -26,7 +26,7 @@ const ExplorePosts = () => {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [localComments, setLocalComments] = useState({});
 
-  useEffect(() => { document.title = 'Explore | Spark'; }, []);
+  useEffect(() => { document.title = 'Explore | Elite Social'; }, []);
   useEffect(() => { if (error) dispatch(showToast(error, 'error')); }, [error, dispatch]);
 
   const allPosts = useMemo(() => {

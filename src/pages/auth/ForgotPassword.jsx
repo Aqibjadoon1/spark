@@ -15,7 +15,7 @@ const ForgotPassword = () => {
   const [sent, setSent] = useState(false);
 
   useEffect(() => {
-    document.title = 'Forgot Password | Spark';
+    document.title = 'Forgot Password | Elite Social';
   }, []);
 
   useEffect(() => {

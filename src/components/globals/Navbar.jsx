@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from '../../redux/actions/authActions';
 import ThemeToggle from '../ui/ThemeToggle';
+import logoSrc from '../../assets/logo/icons8-logo-100.png';
 
 const Navbar = memo(({ onToggleSidebar }) => {
   const [profileOpen, setProfileOpen] = useState(false);
@@ -21,12 +22,8 @@ const Navbar = memo(({ onToggleSidebar }) => {
         <svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
       </button>
       <div className="navbar-logo" onClick={() => navigate('/')}>
-        <div className="navbar-logo-icon">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" />
-          </svg>
-        </div>
-        <span className="navbar-logo-text">SPARK</span>
+        <img src={logoSrc} alt="Elite Social" className="navbar-logo-img" />
+        <span className="navbar-logo-text">Elite Social</span>
       </div>
 
       <div className="navbar-right">
