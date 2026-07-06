@@ -1,8 +1,3 @@
-/**
- * Firestore service for posts.
- * @module services/postService
- */
-
 import {
   collection,
   doc,
@@ -19,22 +14,12 @@ import {
   increment,
 } from 'firebase/firestore';
 import { db } from '../firebase/firebaseSDK';
+import { COLLECTIONS } from '../constants/firestoreCollections';
 
-const postsRef = collection(db, 'posts');
+const getPostRef = (collectionName = COLLECTIONS.POSTS) => collection(db, collectionName);
+const getPostDocRef = (postId, collectionName = COLLECTIONS.POSTS) => doc(db, collectionName, postId);
 
-/**
- * Create a new post.
- * @param {Object} postData
- * @param {string} postData.authorId
- * @param {string} postData.authorName
- * @param {string} postData.authorPhoto
- * @param {string} postData.title
- * @param {string} postData.content
- * @param {string[]} [postData.tags]
- * @param {string} [postData.category]
- * @returns {Promise<import('firebase/firestore').DocumentReference>}
- */
-export const createPost = async (postData) => {
+export const createPost = async (postData, collectionName = COLLECTIONS.POSTS) => {
   try {
     const data = {
       authorId: postData.authorId,
@@ -52,138 +37,70 @@ export const createPost = async (postData) => {
       isEdited: false,
       createdAt: serverTimestamp(),
     };
-    const docRef = await addDoc(postsRef, data);
-    return docRef;
+    return await addDoc(getPostRef(collectionName), data);
   } catch (error) {
     throw new Error(`Failed to create post: ${error.message}`);
   }
 };
 
-/**
- * Update an existing post.
- * @param {string} postId
- * @param {Object} updates
- * @returns {Promise<void>}
- */
-export const updatePost = async (postId, updates) => {
+export const updatePost = async (postId, updates, collectionName = COLLECTIONS.POSTS) => {
   try {
-    const postDoc = doc(db, 'posts', postId);
-    await updateDoc(postDoc, { ...updates, isEdited: true });
+    await updateDoc(getPostDocRef(postId, collectionName), { ...updates, isEdited: true });
   } catch (error) {
     throw new Error(`Failed to update post: ${error.message}`);
   }
 };
 
-/**
- * Delete a post.
- * @param {string} postId
- * @returns {Promise<void>}
- */
-export const deletePost = async (postId) => {
+export const deletePost = async (postId, collectionName = COLLECTIONS.POSTS) => {
   try {
-    const postDoc = doc(db, 'posts', postId);
-    await deleteDoc(postDoc);
+    await deleteDoc(getPostDocRef(postId, collectionName));
   } catch (error) {
     throw new Error(`Failed to delete post: ${error.message}`);
   }
 };
 
-/**
- * Fetch posts with optional category filter and sort order.
- * @param {string} [category]
- * @param {string} [sortBy='createdAt']
- * @param {number} [limitCount=10]
- * @returns {Promise<Array<{id: string, data: Object}>>}
- */
-export const getPosts = async (category, sortBy = 'createdAt', limitCount = 10) => {
+export const getPosts = async (category, sortBy = 'createdAt', limitCount = 10, collectionName = COLLECTIONS.POSTS) => {
   try {
     const constraints = [];
-
-    if (category) {
-      constraints.push(where('category', '==', category));
-    }
-
-    constraints.push(orderBy(sortBy, 'desc'));
-    constraints.push(limitCount);
-
-    const q = query(postsRef, ...constraints);
+    if (category) constraints.push(where('category', '==', category));
+    constraints.push(orderBy(sortBy, 'desc'), limitCount);
+    const q = query(getPostRef(collectionName), ...constraints);
     const snapshot = await getDocs(q);
-
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      data: doc.data(),
-      ...doc.data(),
-    }));
+    return snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data(), ...doc.data() }));
   } catch (error) {
     throw new Error(`Failed to fetch posts: ${error.message}`);
   }
 };
 
-/**
- * Get a single post by ID.
- * @param {string} postId
- * @returns {Promise<Object|null>}
- */
-export const getPostById = async (postId) => {
+export const getPostById = async (postId, collectionName = COLLECTIONS.POSTS) => {
   try {
-    const postDoc = doc(db, 'posts', postId);
-    const snapshot = await getDoc(postDoc);
-
+    const snapshot = await getDoc(getPostDocRef(postId, collectionName));
     if (!snapshot.exists()) return null;
-
     return { id: snapshot.id, ...snapshot.data() };
   } catch (error) {
     throw new Error(`Failed to fetch post: ${error.message}`);
   }
 };
 
-/**
- * Subscribe to real-time post updates.
- * @param {(posts: Array) => void} callback
- * @param {string} [category]
- * @returns {import('firebase/firestore').Unsubscribe}
- */
-export const subscribeToPosts = (callback, category) => {
+export const subscribeToPosts = (callback, category, collectionName = COLLECTIONS.POSTS) => {
   try {
     const constraints = [];
-
-    if (category) {
-      constraints.push(where('category', '==', category));
-    }
-
+    if (category) constraints.push(where('category', '==', category));
     constraints.push(orderBy('createdAt', 'desc'));
-
-    const q = query(postsRef, ...constraints);
-
-    return onSnapshot(
-      q,
-      (snapshot) => {
-        const posts = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        callback(posts);
-      },
-      (error) => {
-        throw new Error(`Post subscription error: ${error.message}`);
-      },
-    );
+    const q = query(getPostRef(collectionName), ...constraints);
+    return onSnapshot(q, (snapshot) => {
+      callback(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+    }, (error) => {
+      throw new Error(`Post subscription error: ${error.message}`);
+    });
   } catch (error) {
     throw new Error(`Failed to subscribe to posts: ${error.message}`);
   }
 };
 
-/**
- * React to a post with an emoji.
- * @param {string} postId
- * @param {string} emoji
- * @param {string} userId
- * @returns {Promise<void>}
- */
-export const reactToPost = async (postId, emoji, userId) => {
+export const reactToPost = async (postId, emoji, userId, collectionName = COLLECTIONS.POSTS) => {
   try {
-    const postDoc = doc(db, 'posts', postId);
-    await updateDoc(postDoc, {
+    await updateDoc(getPostDocRef(postId, collectionName), {
       [`reactions.${emoji}`]: increment(1),
       reactionCount: increment(1),
     });
@@ -192,17 +109,9 @@ export const reactToPost = async (postId, emoji, userId) => {
   }
 };
 
-/**
- * Remove a reaction from a post.
- * @param {string} postId
- * @param {string} emoji
- * @param {string} userId
- * @returns {Promise<void>}
- */
-export const removeReaction = async (postId, emoji, userId) => {
+export const removeReaction = async (postId, emoji, userId, collectionName = COLLECTIONS.POSTS) => {
   try {
-    const postDoc = doc(db, 'posts', postId);
-    await updateDoc(postDoc, {
+    await updateDoc(getPostDocRef(postId, collectionName), {
       [`reactions.${emoji}`]: increment(-1),
       reactionCount: increment(-1),
     });
@@ -211,60 +120,30 @@ export const removeReaction = async (postId, emoji, userId) => {
   }
 };
 
-/**
- * Add a comment to a post and increment the comment count.
- * @param {string} postId
- * @param {Object} comment
- * @returns {Promise<void>}
- */
-export const addComment = async (postId, comment) => {
+export const addComment = async (postId, comment, collectionName = COLLECTIONS.POSTS) => {
   try {
-    const commentsRef = collection(db, 'posts', postId, 'comments');
-    await addDoc(commentsRef, {
-      ...comment,
-      createdAt: serverTimestamp(),
-    });
-
-    const postDoc = doc(db, 'posts', postId);
-    await updateDoc(postDoc, {
-      commentsCount: increment(1),
-    });
+    const commentsRef = collection(db, collectionName, postId, 'comments');
+    await addDoc(commentsRef, { ...comment, createdAt: serverTimestamp() });
+    await updateDoc(getPostDocRef(postId, collectionName), { commentsCount: increment(1) });
   } catch (error) {
     throw new Error(`Failed to add comment: ${error.message}`);
   }
 };
 
-/**
- * Increment the view count of a post.
- * @param {string} postId
- * @returns {Promise<void>}
- */
-export const incrementViewCount = async (postId) => {
+export const incrementViewCount = async (postId, collectionName = COLLECTIONS.POSTS) => {
   try {
-    const postDoc = doc(db, 'posts', postId);
-    await updateDoc(postDoc, {
-      viewCount: increment(1),
-    });
+    await updateDoc(getPostDocRef(postId, collectionName), { viewCount: increment(1) });
   } catch (error) {
     throw new Error(`Failed to increment view count: ${error.message}`);
   }
 };
 
-/**
- * Get all comments for a post, ordered by creation time.
- * @param {string} postId
- * @returns {Promise<Array>}
- */
-export const getComments = async (postId) => {
+export const getComments = async (postId, collectionName = COLLECTIONS.POSTS) => {
   try {
-    const commentsRef = collection(db, 'posts', postId, 'comments');
+    const commentsRef = collection(db, collectionName, postId, 'comments');
     const q = query(commentsRef, orderBy('createdAt', 'asc'));
     const snapshot = await getDocs(q);
-
-    return snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
   } catch (error) {
     throw new Error(`Failed to fetch comments: ${error.message}`);
   }
