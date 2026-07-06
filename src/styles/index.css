@@ -1331,8 +1331,8 @@ body {
   color: var(--color-text-primary);
 }
 
-.feed-form-drawer { overflow: hidden; transition: max-height 0.35s ease, opacity 0.3s ease; max-height: 0; opacity: 0; }
-.feed-form-drawer--open { max-height: 1200px; opacity: 1; }
+.feed-form-drawer { overflow: hidden; transition: max-height 0.35s ease, opacity 0.3s ease; max-height: 0; opacity: 0; padding-top: 0; }
+.feed-form-drawer--open { max-height: 1200px; opacity: 1; padding-top: 16px; }
 .feed-form-drawer-header {
   display: none;
   align-items: center;
