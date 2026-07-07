@@ -1,0 +1,82 @@
+<h2>Phase 1: Layout &amp; Sidebar</h2>
+<p class="subtitle">Exact match to design HTML spec</p>
+
+<div class="split">
+  <div class="mockup">
+    <div class="mockup-header">Current</div>
+    <div class="mockup-body" style="padding:0">
+      <div style="display:flex">
+        <div class="mock-sidebar" style="width:256px;position:sticky;min-height:200px">
+          🟣 Feed<br/>
+          🔍 Explore<br/>
+          👥 Friends<br/>
+          📍 Nearby<br/>
+          💬 Messages<br/>
+          🔖 Bookmarks<br/>
+          🔔 Notifications<br/>
+          👤 Profile<br/>
+          📊 Analytics<br/>
+          ⚙ Settings<br/>
+          <hr/>🚪 Logout
+        </div>
+        <div class="mock-content" style="flex:1">[Content]</div>
+      </div>
+    </div>
+  </div>
+  <div class="mockup">
+    <div class="mockup-header">Target (Design HTML)</div>
+    <div class="mockup-body" style="padding:0">
+      <div style="display:flex;min-height:200px">
+        <div style="width:256px;background:#131319;border-right:1px solid rgba(255,177,195,0.2);padding:32px 0;display:flex;flex-direction:column;font-size:12px">
+          <div style="padding:0 32px;margin-bottom:40px">
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="color:#ffb1c3;font-size:28px">🎮</span>
+              <span style="color:#ffb1c3;font-weight:700;font-size:24px;letter-spacing:-0.02em">Elite Social</span>
+            </div>
+            <span style="color:#00dce6;font-size:13px;margin-left:44px;text-transform:uppercase;letter-spacing:0.1em">Pro Gaming Network</span>
+          </div>
+          <div style="border-right:4px solid #ffb1c3;background:rgba(255,75,137,0.1);padding:12px 24px;display:flex;align-items:center;gap:16px;color:#ffb1c3;font-weight:700">
+            <span>📰</span><span>Feed</span>
+          </div>
+          <div style="padding:12px 24px;display:flex;align-items:center;gap:16px;color:#e5bcc4">🔍 Explore</div>
+          <div style="padding:12px 24px;display:flex;align-items:center;gap:16px;color:#e5bcc4">👥 Friends</div>
+          <div style="padding:12px 24px;display:flex;align-items:center;gap:16px;color:#e5bcc4">📍 Nearby</div>
+          <div style="padding:12px 24px;display:flex;align-items:center;gap:16px;color:#e5bcc4">💬 Messages</div>
+          <div style="margin-top:32px;padding:0 24px">
+            <div style="background:linear-gradient(135deg,#ff4b89,#bb0058);color:#590026;padding:12px;border-radius:8px;text-align:center;font-weight:700;box-shadow:0 0 15px rgba(255,177,195,0.4)">+ New Post</div>
+          </div>
+          <div style="margin-top:auto;padding:0 24px">
+            <div style="padding:12px 16px;color:#e5bcc4;display:flex;align-items:center;gap:16px">🚪 Logout</div>
+          </div>
+        </div>
+        <div style="flex:1;padding:32px;background:#131319">
+          <div style="color:#ffb1c3;font-size:48px;font-weight:700;letter-spacing:-0.04em">Feed</div>
+          <div style="color:#00dce6;font-size:13px">See what's happening in your community</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>Changes needed</h3>
+  <table style="width:100%;border-collapse:collapse">
+    <tr><th style="text-align:left;border-bottom:1px solid #333;padding:8px">File</th><th style="text-align:left;border-bottom:1px solid #333;padding:8px">Change</th></tr>
+    <tr><td style="padding:8px"><code>index.css</code></td><td>Replace grid layout → fixed sidebar + ml-64 content. Update left-sidebar classes. Add brand, nav-item-active, new-post-btn styles.</td></tr>
+    <tr><td style="padding:8px"><code>UnifiedLayout.jsx</code></td><td>Remove grid wrapper. Sidebar is fixed via CSS, content has margin-left.</td></tr>
+    <tr><td style="padding:8px"><code>LeftSidebar.jsx</code></td><td>Add brand section with icon+title+subtitle. Update nav items with active border-right. Add "New Post" gradient button. Keep routing logic.</td></tr>
+  </table>
+</div>
+
+<p style="margin-top:1rem">Take a look and let me know if this matches what you want. Click any option below to confirm.</p>
+
+<div class="options">
+  <div class="option" data-choice="proceed" onclick="toggleSelect(this)">
+    <div class="letter">✓</div>
+    <div class="content"><h3>Looks good, proceed</h3><p>Start implementing Phase 1</p></div>
+  </div>
+  <div class="option" data-choice="modify" onclick="toggleSelect(this)">
+    <div class="letter">✎</div>
+    <div class="content"><h3>Need adjustments</h3><p>Tell me what to change</p></div>
+  </div>
+</div>

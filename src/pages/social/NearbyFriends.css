@@ -55,17 +55,23 @@
   border: 3px solid #fff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.nf-user-marker:hover {
+  transform: scale(1.15);
 }
 
 .nf-user-marker.self {
-  background: var(--color-primary-light);
+  background: var(--color-accent, #00dce6);
   width: 40px;
   height: 40px;
   border-width: 3px;
+  box-shadow: 0 0 12px rgba(0, 220, 230, 0.5);
 }
 
 .nf-user-marker.online {
-  border-color: #22c55e;
+  border-color: var(--color-success, #22c55e);
 }
 
 .nf-marker-popup {

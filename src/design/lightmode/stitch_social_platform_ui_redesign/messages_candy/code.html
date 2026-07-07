@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Messages - Elite Social</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "tertiary": "#0096cc",
+                "on-tertiary-fixed": "#001a33",
+                "error-container": "#ffe8e8",
+                "on-primary-fixed-variant": "#a02070",
+                "on-primary-fixed": "#3d0028",
+                "on-secondary-fixed-variant": "#4a3068",
+                "inverse-on-surface": "#fef7ff",
+                "outline-variant": "#dcc8e0",
+                "primary-fixed": "#ffd6ee",
+                "secondary-fixed-dim": "#c8a8e8",
+                "on-background": "#2e1a28",
+                "on-surface-variant": "#604868",
+                "secondary-fixed": "#eedcff",
+                "outline": "#907898",
+                "on-surface": "#2e1a28",
+                "on-tertiary-container": "#00334d",
+                "surface-bright": "#fef7ff",
+                "background": "#fef7ff",
+                "primary": "#e040a0",
+                "primary-fixed-dim": "#f0a0cc",
+                "on-secondary": "#ffffff",
+                "on-primary-container": "#2e1a28",
+                "on-tertiary": "#ffffff",
+                "surface-container-highest": "#ece2ec",
+                "primary-container": "#f080c0",
+                "inverse-primary": "#f0a0cc",
+                "tertiary-fixed-dim": "#80d0f0",
+                "on-secondary-container": "#2e2040",
+                "surface-container": "#f8eef8",
+                "inverse-surface": "#2e1a28",
+                "surface-container-lowest": "#ffffff",
+                "on-error": "#ffffff",
+                "on-secondary-fixed": "#1a1030",
+                "surface-dim": "#e0d6e0",
+                "secondary": "#7c52aa",
+                "secondary-container": "#eedcff",
+                "tertiary-container": "#40c0ee",
+                "surface-tint": "#e040a0",
+                "surface-container-high": "#f2e8f2",
+                "surface-variant": "#f2e8f2",
+                "surface-container-low": "#fbf2fb",
+                "error": "#e53e3e",
+                "on-primary": "#ffffff",
+                "on-tertiary-fixed-variant": "#005580",
+                "surface": "#fef7ff",
+                "tertiary-fixed": "#c8eaff",
+                "on-error-container": "#9b1c1c"
+        },
+        "borderRadius": {
+                "DEFAULT": "1rem",
+                "lg": "2rem",
+                "xl": "3rem",
+                "full": "9999px"
+        },
+        "spacing": {},
+        "fontFamily": {
+                "headline": [
+                        "Dm Sans"
+                ],
+                "display": [
+                        "Dm Sans"
+                ],
+                "body": [
+                        "Dm Sans"
+                ],
+                "label": [
+                        "Dm Sans"
+                ]
+        },
+        "fontSize": {}
+},
+    },
+  }
+</script>
+<style>
+        /* Custom scrollbar for the chat area to match the sleek design */
+        .chat-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-scroll::-webkit-scrollbar-thumb {
+            background-color: rgba(224, 64, 160, 0.2); /* primary with low opacity */
+            border-radius: 9999px;
+        }
+        .chat-scroll::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(224, 64, 160, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body antialiased overflow-hidden flex h-screen">
+<!-- SideNavBar -->
+<nav class="w-64 h-screen fixed left-0 top-0 hidden lg:flex flex-col border-r border-outline-variant/30 bg-background z-50">
+<div class="flex flex-col justify-between py-8 h-full">
+<div>
+<!-- Brand Header -->
+<div class="px-6 mb-10 flex items-center gap-3">
+<img class="w-8 h-8 object-contain" data-alt="A stylized glowing metallic crest or wing emblem representing an elite gaming rank, illuminated with purple and pink neon hues against a dark background, acting as a high-end application logo." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeL2Cv4yOqqgBjqFqMFamDVvotO52tEZ6Xexh6tuXJ9H1hyL4DjX2Rz3dDO-MV7QbHVTLVHoNOyRoKWGr7gca7sMR8qYbn608Lymlbg96QWXNgsAHhbiXz9LptowSTytKrbWbxT5P29pACxvolRjbr6cXKnW11u_3e2DMIzgIWv1piqocwk1Bhs6ym1M0-yhAX6VYp88mAyg3_p_zJY0l9H8rz2-cbbGTqyppQynLvWqWkOF-fAJTw"/>
+<div>
+<h1 class="font-headline text-2xl font-bold text-primary tracking-tight">Elite Social</h1>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex flex-col gap-2 px-3">
+<a class="flex items-center gap-4 px-6 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dynamic_feed">dynamic_feed</span>
+<span class="font-label text-sm font-medium uppercase tracking-wider">Feed</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-label text-sm font-medium uppercase tracking-wider">Explore</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label text-sm font-medium uppercase tracking-wider">Friends</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="map">map</span>
+<span class="font-label text-sm font-medium uppercase tracking-wider">Nearby</span>
+</a>
+<!-- Active State -->
+<a class="flex items-center gap-4 px-6 py-3 rounded-full bg-primary-container/30 text-primary font-bold duration-100 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble" data-weight="fill">chat_bubble</span>
+<span class="font-label text-sm font-medium uppercase tracking-wider">Messages</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="bookmark">bookmark</span>
+<span class="font-label text-sm font-medium uppercase tracking-wider">Bookmarks</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-label text-sm font-medium uppercase tracking-wider">Notifications</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person_pin">person_pin</span>
+<span class="font-label text-sm font-medium uppercase tracking-wider">Profile</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="monitoring">monitoring</span>
+<span class="font-label text-sm font-medium uppercase tracking-wider">Analytics</span>
+</a>
+<a class="flex items-center gap-4 px-6 py-3 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label text-sm font-medium uppercase tracking-wider">Settings</span>
+</a>
+</div>
+</div>
+<!-- Footer Links -->
+<div class="px-6 mt-auto">
+<a class="flex items-center gap-4 py-3 rounded-full text-error hover:text-error-container transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label text-sm font-medium uppercase tracking-wider">Logout</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- TopAppBar (Mobile/Tablet) & Global Top Bar elements -->
+<header class="fixed top-0 right-0 left-0 lg:left-64 h-16 z-40 bg-background/80 backdrop-blur-md border-b border-outline-variant/30 flex justify-between items-center px-6">
+<!-- Mobile Logo -->
+<div class="lg:hidden flex items-center gap-2">
+<img class="w-6 h-6 object-contain" data-alt="A stylized glowing metallic crest or wing emblem representing an elite gaming rank, illuminated with purple and pink neon hues against a dark background, acting as a high-end application logo." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBjQ9rTFWJlgz8kRs9i0YFfF6sucC6Fokh0emI5GVaMmFYGJFN_INogmhPLROMetG3OJwXi-SKuImshdYlCNLXSFn7AZfgWZ03di6xETtU3Gv0Luqe0krmD0Ggrg0VjYpgCHBOkqD4PDff1UKPVYB7A9LneLVm6TkIDaaVTaDANlIKda2icDiN179lRH2ZXr3qu0Y_8AveRl1s11B348wlxyPnG002NiXSEDEfO64DXUYU-VMB9fCZT"/>
+<span class="font-headline text-xl font-bold text-primary">Elite Social</span>
+</div>
+<!-- Desktop Header Title Placeholder (Empty to maintain alignment if needed, or page context) -->
+<div class="hidden lg:block text-on-surface">
+<!-- Space for search or context if needed in future -->
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:bg-surface-container-highest rounded-full p-2 transition-all focus:ring-2 ring-primary/50">
+<span class="material-symbols-outlined" data-icon="light_mode">light_mode</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-highest rounded-full p-2 transition-all focus:ring-2 ring-primary/50 relative">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary/30 cursor-pointer hover:border-primary transition-colors">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="A close-up cinematic portrait of a competitive gamer wearing a premium dark hoodie in a dimly lit room with purple and teal neon rim lighting. High contrast, sharp focus, professional e-sports aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFJMJmcka4NdxOw9SXGCM2u5oyaXSAyijfckdouF1YKnYq7w2VNc7Crmovqc9cCbZX_MniXgMY-iNuw7ZZkhEim8OyDgETjqWgbNHo7eG3xjWI3s5Is_ncn1xe9eFe9nSNbP9FLYjdK0BnLooHdZ37PeyD9JNTrI1A-1tDIU6p93Mn2CE4hXo4u-u0KGgCzOQpfjjzH4qjXndzym_mu95Cyi4RGo5SD2aHDkL6qKdhzD3MTlPLjNPy"/>
+</div>
+</div>
+</header>
+<!-- BottomNavBar (Mobile) -->
+<nav class="fixed bottom-0 w-full z-50 lg:hidden rounded-t-[3rem] bg-surface-container backdrop-blur-xl border-t border-outline-variant/30 shadow-lg">
+<div class="flex justify-around items-center h-20 w-full px-4">
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant p-2 rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="dynamic_feed">dynamic_feed</span>
+<span class="font-label text-[10px] uppercase font-medium mt-1">Feed</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant p-2 rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-label text-[10px] uppercase font-medium mt-1">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant p-2 rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label text-[10px] uppercase font-medium mt-1">Friends</span>
+</a>
+<!-- Active State -->
+<a class="flex flex-col items-center justify-center text-primary bg-primary-container/30 rounded-full px-6 py-2" href="#">
+<span class="material-symbols-outlined" data-icon="chat_bubble" data-weight="fill">chat_bubble</span>
+<span class="font-label text-[10px] uppercase font-bold mt-1">Messages</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 lg:ml-64 mt-16 lg:mt-16 h-[calc(100vh-4rem)] lg:h-[calc(100vh-4rem)] flex flex-col p-4 md:p-6 lg:p-8 pb-24 lg:pb-8">
+<!-- Page Header -->
+<div class="mb-6 flex-shrink-0">
+<h2 class="font-display text-4xl md:text-5xl font-bold text-on-surface">Messages</h2>
+<p class="font-body text-lg text-on-surface-variant mt-2">Private conversations</p>
+</div>
+<!-- Chat Interface Container (Bento/Glassmorphic Style) -->
+<div class="flex-1 flex flex-col md:flex-row gap-4 md:gap-6 overflow-hidden min-h-0 relative">
+<!-- Left Pane: Conversation List -->
+<div class="w-full md:w-80 lg:w-96 flex-shrink-0 flex flex-col bg-surface-container rounded-[3rem] border border-outline-variant/30 overflow-hidden relative shadow-lg">
+<!-- New Message Button -->
+<div class="p-6 border-b border-outline-variant/20">
+<button class="w-full py-4 px-6 rounded-full border-2 border-primary/20 hover:border-primary/50 text-primary hover:text-primary transition-all flex items-center justify-center gap-2 bg-surface-bright hover:bg-surface shadow-sm">
+<span class="material-symbols-outlined text-lg" data-icon="add">add</span>
+<span class="font-label text-sm uppercase font-bold tracking-wider">New Message</span>
+</button>
+</div>
+<!-- Conversation List -->
+<div class="flex-1 overflow-y-auto chat-scroll py-4 px-3">
+<!-- Active Chat Item -->
+<div class="px-4 py-4 mb-2 flex items-center gap-4 bg-primary-container/30 rounded-[2rem] cursor-pointer hover:bg-primary-container/40 transition-colors relative">
+<!-- Avatar -->
+<div class="relative flex-shrink-0">
+<div class="w-14 h-14 rounded-full overflow-hidden border-2 border-primary">
+<img class="w-full h-full object-cover" data-alt="A moody, high-contrast portrait of a gamer wearing a sleek headset, illuminated by neon purple light against a pure black background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCr8owmUfXW24mH857XGJP_okYTQ8DdbjpQkYRl4bZJSRnOTWMK1U7N4BCiEKs_hUR2bFvZVZAv-8VpGKezpXwtu83AFgGxdNjfzdgXLlCdYj45-8N2d2XuvBQDfYyR47ihMmQle9bEQzrBRcgJjM1YxFC9vP2yfQswQXm2QHzsLojea95SLbKxTiX45Rp2ZMnukeUERBZY6F6XzzWLPZz0wlo33SaIG320SPzbBPzPTe1B8QPWDAUC"/>
+</div>
+<div class="absolute bottom-0 right-0 w-4 h-4 bg-tertiary rounded-full border-2 border-surface-container"></div>
+</div>
+<!-- Content -->
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-headline text-base font-bold text-on-surface truncate pr-2">Aqib Jadoon</h3>
+<span class="font-label text-xs font-medium text-primary flex-shrink-0">19h ago</span>
+</div>
+<p class="font-body text-sm text-on-surface-variant truncate">Hello</p>
+</div>
+</div>
+<!-- Inactive Chat Item -->
+<div class="px-4 py-4 mb-2 flex items-center gap-4 rounded-[2rem] cursor-pointer hover:bg-surface-container-highest transition-colors">
+<div class="relative flex-shrink-0">
+<div class="w-14 h-14 rounded-full overflow-hidden bg-surface-variant flex items-center justify-center text-primary font-headline text-xl font-bold">
+                                a
+                            </div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-headline text-base font-bold text-on-surface truncate pr-2">aqib jadoon</h3>
+<span class="font-label text-xs font-medium text-on-surface-variant flex-shrink-0">22h ago</span>
+</div>
+<p class="font-body text-sm text-on-surface-variant truncate">juujuj</p>
+</div>
+</div>
+<!-- Another Inactive Chat Item -->
+<div class="px-4 py-4 mb-2 flex items-center gap-4 rounded-[2rem] cursor-pointer hover:bg-surface-container-highest transition-colors">
+<div class="relative flex-shrink-0">
+<div class="w-14 h-14 rounded-full overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A female e-sports athlete in profile, focused intensely on a screen out of frame, lit by cool cyan and magenta ambient lighting in a high-tech studio environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDK-_FjQhDFCcmvznRBOPe8I8Pyv9Q_QRiY3IbO511OIn1JrEMzVvF6oyDrFdrJhPmK9QHuXmXAKTmmhTDEVOhx6vfibh3btiaodMULwiZY40q9KnogGNkGpq2Lb82vQhPnm04h9_1jMiL4tc0906biFGTAoYyA9C0zHCW9XOcH_Gn-rc5bfaAOTevYiUgLNkBgKbgDs4l5Xd99ZLCQBiDsKkp7bLeVTtosIoTfU5i4fbFctB8Wq9h9"/>
+</div>
+<div class="absolute bottom-0 right-0 w-4 h-4 bg-outline rounded-full border-2 border-surface-container"></div>
+</div>
+<div class="flex-1 min-w-0">
+<div class="flex justify-between items-baseline mb-1">
+<h3 class="font-headline text-base font-bold text-on-surface truncate pr-2">Sarah 'Nexus' Vance</h3>
+<span class="font-label text-xs font-medium text-on-surface-variant flex-shrink-0">Yesterday</span>
+</div>
+<p class="font-body text-sm text-on-surface-variant truncate">GGs! Let's run it back tomorrow.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Pane: Active Chat Window -->
+<div class="hidden md:flex flex-1 flex-col bg-surface-container rounded-[3rem] border border-outline-variant/30 relative shadow-lg overflow-hidden">
+<!-- Chat Header -->
+<div class="h-20 border-b border-outline-variant/20 px-8 flex items-center justify-between bg-surface-bright z-20">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant/30">
+<img class="w-full h-full object-cover" data-alt="A moody, high-contrast portrait of a gamer wearing a sleek headset, illuminated by neon purple light against a pure black background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0KrHjaD_JW2yq8N3Ipdly7P50XghVRy-tir5aC0pwpE_FJRlcXFMh1Xyzh6jj_Uv4ag5JrkxXR9hNG0n2EG6ozmgdaXRfknqS-P0cHWvsePz1RQ59oNcdnMOBPZ5RBD019aMaWGcQFPaH7k4_lzTbZLzKjJPcYV10KE8rgmmjbfnnRFuaOs_yFEZA5LPO8lHV0JZiuWBp5Fe_1fed5qOr007MZaa9eSI7MwHe5PkyCb-kLVRYzAe2"/>
+</div>
+<div>
+<h3 class="font-headline text-lg font-bold text-on-surface">Aqib Jadoon</h3>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="p-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-highest rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<button class="p-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-highest rounded-full transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</div>
+</div>
+<!-- Messages Area -->
+<div class="flex-1 overflow-y-auto p-8 flex flex-col gap-6 chat-scroll z-20 bg-surface">
+<!-- Timestamp Separator -->
+<div class="flex justify-center">
+<span class="px-4 py-1.5 bg-surface-container-highest text-on-surface-variant rounded-full font-label text-xs uppercase tracking-wider font-medium">Yesterday</span>
+</div>
+<!-- Received Message -->
+<div class="flex flex-col items-start max-w-[80%]">
+<div class="bg-surface-container-highest text-on-surface px-5 py-4 rounded-[2rem] rounded-tl-md shadow-sm relative group">
+<p class="font-body text-base">kikiki</p>
+</div>
+<span class="font-label text-[10px] text-on-surface-variant mt-2 ml-2 font-medium">22h ago</span>
+</div>
+<!-- Received Message -->
+<div class="flex flex-col items-start max-w-[80%]">
+<div class="bg-surface-container-highest text-on-surface px-5 py-4 rounded-[2rem] rounded-tl-md shadow-sm relative group">
+<p class="font-body text-base">hello</p>
+</div>
+<span class="font-label text-[10px] text-on-surface-variant mt-2 ml-2 font-medium">20h ago</span>
+</div>
+<!-- Sent Message Block -->
+<div class="flex flex-col items-end gap-2 self-end max-w-[80%]">
+<div class="bg-primary text-on-primary px-5 py-4 rounded-[2rem] rounded-tr-md shadow-sm relative group">
+<p class="font-body text-base">o ma gululu</p>
+</div>
+<div class="bg-primary text-on-primary px-5 py-4 rounded-[2rem] rounded-r-md shadow-sm relative group">
+<p class="font-body text-base">hi bro</p>
+</div>
+<div class="bg-primary text-on-primary px-5 py-4 rounded-[2rem] rounded-br-md shadow-sm relative group">
+<p class="font-body text-base">asdasd</p>
+</div>
+<span class="font-label text-[10px] text-on-surface-variant mt-2 mr-2 font-medium">19h ago</span>
+</div>
+<!-- Received Message (Latest) -->
+<div class="flex flex-col items-start max-w-[80%]">
+<div class="bg-surface-container-highest text-on-surface px-5 py-4 rounded-[2rem] rounded-tl-md shadow-sm relative group">
+<p class="font-body text-base">Hello</p>
+</div>
+<span class="font-label text-[10px] text-on-surface-variant mt-2 ml-2 font-medium">19h ago</span>
+</div>
+<!-- Spacer to ensure latest messages aren't hidden by input area -->
+<div class="h-4"></div>
+</div>
+<!-- Input Area -->
+<div class="p-6 border-t border-outline-variant/20 bg-surface-bright z-20">
+<div class="flex items-center gap-4">
+<button class="p-3 text-on-surface-variant hover:text-primary hover:bg-surface-container-highest rounded-full transition-colors flex-shrink-0">
+<span class="material-symbols-outlined text-[28px]" data-icon="add_circle">add_circle</span>
+</button>
+<div class="flex-1 relative">
+<input class="w-full bg-surface-container border border-outline-variant/30 rounded-full py-4 px-6 text-on-surface font-body text-base placeholder-on-surface-variant/70 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all shadow-inner" placeholder="Type a message..." type="text"/>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-on-primary rounded-full py-4 px-8 font-label font-bold uppercase tracking-wider shadow-lg shadow-primary/30 transition-all flex items-center justify-center flex-shrink-0">
+                            Send
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

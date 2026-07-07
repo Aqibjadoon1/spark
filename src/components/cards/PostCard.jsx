@@ -20,6 +20,26 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
   const menuRef = useRef(null);
   const longPressTimer = useRef(null);
 
+  const closeReactionPicker = useCallback(() => {
+    setShowReactions(false);
+    setLongPress(false);
+  }, []);
+
+  useEffect(() => {
+    if (!showReactions && !showMenu) return;
+    const handleClickOutside = (e) => {
+      if (showReactions && pickerRef.current && !pickerRef.current.contains(e.target) &&
+          likeRef.current && !likeRef.current.contains(e.target)) {
+        closeReactionPicker();
+      }
+      if (showMenu && menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showReactions, showMenu, closeReactionPicker]);
+
   if (!post) return null;
 
   const {
@@ -46,26 +66,6 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
       navigate(`/post/${id}`);
     }
   };
-
-  const closeReactionPicker = useCallback(() => {
-    setShowReactions(false);
-    setLongPress(false);
-  }, []);
-
-  useEffect(() => {
-    if (!showReactions && !showMenu) return;
-    const handleClickOutside = (e) => {
-      if (showReactions && pickerRef.current && !pickerRef.current.contains(e.target) &&
-          likeRef.current && !likeRef.current.contains(e.target)) {
-        closeReactionPicker();
-      }
-      if (showMenu && menuRef.current && !menuRef.current.contains(e.target)) {
-        setShowMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showReactions, showMenu, closeReactionPicker]);
 
   const handleLikeClick = (e) => {
     e.stopPropagation();

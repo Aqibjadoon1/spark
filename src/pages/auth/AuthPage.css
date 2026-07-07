@@ -32,7 +32,7 @@
   width: 500px;
   height: 500px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(161,92,255,0.12), transparent 70%);
+  background: radial-gradient(circle, rgba(255,177,195,0.10), transparent 70%);
   z-index: 0;
   pointer-events: none;
 }
@@ -45,7 +45,7 @@
   width: 400px;
   height: 400px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,60,157,0.10), transparent 70%);
+  background: radial-gradient(circle, rgba(255,75,137,0.08), transparent 70%);
   z-index: 0;
   pointer-events: none;
 }
@@ -79,7 +79,7 @@
 .auth-overlay-bg {
   position: absolute;
   inset: -40px -80px;
-  background: linear-gradient(135deg, #4A6CFF, #A15CFF, #FF3C9D);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-container), var(--color-inverse-primary));
   z-index: 0;
 }
 
@@ -108,7 +108,7 @@
   width: 400px;
   height: 400px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255,60,157,0.12), transparent 70%);
+  background: radial-gradient(circle, rgba(255,75,137,0.10), transparent 70%);
 }
 
 /* Particles + forms container */
@@ -247,7 +247,7 @@
   display: block;
   font-size: 13px;
   font-weight: 700;
-  color: var(--color-accent);
+  color: var(--color-primary);
   letter-spacing: 3px;
   text-transform: uppercase;
   margin-bottom: 12px;
@@ -307,8 +307,8 @@
   box-sizing: border-box;
 }
 .auth-input:focus {
-  border-color: var(--color-primary-light);
-  box-shadow: 0 0 0 3px rgba(161,92,255,0.25), inset 0 1px rgba(255,255,255,0.02);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(255,177,195,0.20), inset 0 1px rgba(255,255,255,0.02);
 }
 .auth-input::placeholder { color: var(--color-text-muted); }
 
@@ -318,7 +318,7 @@
 
 .auth-field-error {
   font-size: 12px;
-  color: #FF3C9D;
+  color: var(--color-primary-container);
   padding-left: 4px;
 }
 
@@ -347,8 +347,8 @@
 }
 
 .auth-checkbox:checked {
-  background: var(--color-primary-light);
-  border-color: var(--color-primary-light);
+  background: var(--color-primary-container);
+  border-color: var(--color-primary-container);
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3E%3C/svg%3E");
   background-size: 14px;
   background-position: center;
@@ -363,7 +363,7 @@
 }
 
 .auth-check-label a {
-  color: #A15CFF;
+  color: var(--color-primary);
   text-decoration: none;
 }
 
@@ -377,8 +377,8 @@
   height: 58px;
   border: none;
   border-radius: 14px;
-  background: linear-gradient(135deg, #7B4DFF, #FF3FA7);
-  color: var(--color-text-white);
+  background: linear-gradient(135deg, var(--color-primary-container), var(--color-inverse-primary));
+  color: var(--color-on-primary-container);
   font-family: 'Inter', sans-serif;
   font-size: 16px;
   font-weight: 700;
@@ -394,7 +394,7 @@
 .auth-submit-btn:hover:not(:disabled) {
   filter: brightness(1.1);
   transform: translateY(-2px);
-  box-shadow: 0 15px 45px rgba(255,70,180,0.55);
+  box-shadow: 0 0 25px rgba(255,177,195,0.60);
 }
 
 .auth-submit-btn:disabled {
@@ -445,7 +445,7 @@
   background: var(--border-light);
   border-color: var(--border-strong);
   color: rgba(255,255,255,0.80);
-  box-shadow: 0 0 20px rgba(161,92,255,0.35);
+  box-shadow: 0 0 20px rgba(255,177,195,0.25);
 }
 
 .auth-google-btn:disabled {
@@ -464,7 +464,7 @@
 }
 
 .auth-footer-link {
-  color: #A15CFF;
+  color: var(--color-primary);
   text-decoration: none;
   font-weight: 600;
   cursor: pointer;
@@ -494,7 +494,7 @@
 }
 
 .auth-forgot-link:hover {
-  color: #A15CFF;
+  color: var(--color-primary);
 }
 
 /* ====== TABLET (768 - 1199px) ====== */
@@ -757,16 +757,16 @@
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
-  background: rgba(161,92,255,0.10);
+  background: rgba(255,177,195,0.10);
 }
 
 .forgot-btn {
   display: inline-block;
   padding: 14px 32px;
-  background: linear-gradient(135deg, #7B4DFF, #FF3FA7);
+  background: linear-gradient(135deg, var(--color-primary-container), var(--color-inverse-primary));
   border: none;
   border-radius: 14px;
-  color: var(--color-text-white);
+  color: var(--color-on-primary-container);
   font-family: 'Inter', sans-serif;
   font-size: 15px;
   font-weight: 700;
@@ -796,7 +796,7 @@
 }
 
 .forgot-back-link:hover {
-  color: #A15CFF;
+  color: var(--color-primary);
 }
 
 @media (max-width: 480px) {

@@ -139,13 +139,14 @@ const Friends = () => {
           {(u.displayName || u.name || '?').charAt(0).toUpperCase()}
         </div>
       )}
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div className="friend-info">
         <div className="friend-name">{u.displayName || u.name || 'Unknown'}</div>
         <div className="friend-mutual">{u.email || ''}</div>
       </div>
       {showChat && (
-        <button onClick={() => handleStartChat(u.uid)} className="friend-chat-btn" title="Message">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        <button onClick={() => handleStartChat(u.uid)} className="friend-message-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
+          Message
         </button>
       )}
     </div>
@@ -165,13 +166,11 @@ const Friends = () => {
       </div>
 
       {friendRequests.length > 0 && (
-        <section>
-          <h2 className="panel-card-title" style={{ fontSize: 16, marginBottom: 12 }}>
-            Friend Requests ({friendRequests.length})
-          </h2>
-          <div className="panel-card" style={{ padding: 0, overflow: 'hidden' }}>
+        <section className="friend-section">
+          <h2 className="friend-section-title">Friend Requests ({friendRequests.length})</h2>
+          <div className="friend-list-card">
             {friendRequests.map((u) => (
-              <div key={u.uid} className="friend-row" style={{ borderRadius: 0 }}>
+              <div key={u.uid} className="friend-row">
                 {u.photoURL ? (
                   <img src={u.photoURL} alt={u.displayName || u.name} className="friend-avatar" />
                 ) : (
@@ -179,7 +178,7 @@ const Friends = () => {
                     {(u.displayName || u.name || '?').charAt(0).toUpperCase()}
                   </div>
                 )}
-                <div style={{ flex: 1 }}>
+                <div className="friend-info">
                   <div className="friend-name">{u.displayName || u.name || 'Unknown'}</div>
                 </div>
                 <button onClick={() => handleAccept(u.uid)} className="btn btn-sm btn-primary" style={{ borderRadius: 8 }}>
@@ -194,10 +193,8 @@ const Friends = () => {
         </section>
       )}
 
-      <section>
-        <h2 className="panel-card-title" style={{ fontSize: 16, marginBottom: 12 }}>
-          My Friends ({myFriends.length})
-        </h2>
+      <section className="friend-section">
+        <h2 className="friend-section-title">My Friends ({myFriends.length})</h2>
         {myFriends.length === 0 ? (
           <EmptyState
             icon={
@@ -211,7 +208,7 @@ const Friends = () => {
             description="Add friends by email to start connecting"
           />
         ) : (
-          <div className="panel-card" style={{ padding: 0, overflow: 'hidden' }}>
+          <div className="friend-list-card">
             {myFriends.map((u) => (
               <UserRow key={u.uid} u={u} showChat />
             ))}

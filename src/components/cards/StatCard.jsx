@@ -6,19 +6,19 @@ const StatCard = memo(({ icon, label, value = 0, change, color = 'bg-lime' }) =>
   const isNegative = change < 0;
 
   return (
-    <div className="bg-[#F3F3F3] dark:bg-dark-card border border-gray-200 dark:border-dark-border rounded-[45px] p-5 shadow-[4px_4px_0px_#000] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[7px_7px_0px_#000] transition-all duration-200">
+    <div className="card-neubrutal">
       <div className="flex items-start justify-between mb-3">
         <div className={`p-3 rounded-xl ${color}`}>
           {icon}
         </div>
       </div>
-      <p className="text-2xl font-bold text-[#191A23] dark:text-white">{formatNumber(value)}</p>
+      <p className="card-stat-value">{formatNumber(value)}</p>
       <div className="flex items-center gap-2 mt-1">
-        <p className="text-sm text-gray-500 dark:text-text-muted">{label}</p>
+        <p className="text-sm" style={{fontSize:14,color:'var(--color-text-muted)'}}>{label}</p>
         {change !== undefined && change !== null && (
           <span
-            className={`flex items-center gap-0.5 text-xs font-medium ${
-              isPositive ? 'text-green-400' : isNegative ? 'text-red' : 'text-gray-500 dark:text-text-muted'
+            className={`card-stat-change ${
+              isPositive ? 'card-stat-change-pos' : isNegative ? 'card-stat-change-neg' : ''
             }`}
           >
             {isPositive ? (

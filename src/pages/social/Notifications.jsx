@@ -98,7 +98,7 @@ const Notifications = () => {
         <p className="feed-subtitle">Stay updated with your community</p>
       </div>
 
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+      <div className="notif-filters">
         {['all', 'like', 'follow', 'comment', 'mention', 'system'].map((type) => {
           const total = type === 'all' ? notifications.length : (countsByType[type] || 0);
           const unread = type === 'all' ? unreadAll : (countsByType[`${type}_unread`] || 0);
@@ -106,23 +106,11 @@ const Notifications = () => {
             <button
               key={type}
               onClick={() => setActiveFilter(type)}
-              style={{
-                padding: '6px 14px', borderRadius: 20, border: activeFilter === type ? '1px solid transparent' : '1px solid var(--border-light)',
-                background: activeFilter === type ? 'linear-gradient(135deg, #7B4DFF, #FF3C9D)' : 'var(--bg-glass)',
-                color: activeFilter === type ? '#fff' : 'var(--color-text-primary)',
-                fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                boxShadow: activeFilter === type ? '0 2px 8px rgba(123,77,255,0.3)' : 'none',
-                transition: 'all 0.2s',
-              }}
+              className={`notif-filter${activeFilter === type ? ' notif-filter--active' : ''}`}
             >
               {type === 'all' ? 'All' : type.charAt(0).toUpperCase() + type.slice(1)}
               {unread > 0 && (
-                <span style={{
-                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                  marginLeft: 6, minWidth: 18, height: 18, borderRadius: 9,
-                  background: activeFilter === type ? 'rgba(255,255,255,0.25)' : 'var(--color-primary-light)',
-                  fontSize: 10, fontWeight: 700, padding: '0 4px',
-                }}>
+                <span className={`notif-filter-badge${activeFilter === type ? ' notif-filter-badge--active' : ''}`}>
                   {unread}
                 </span>
               )}
@@ -130,45 +118,36 @@ const Notifications = () => {
           );
         })}
         {unreadAll > 0 && (
-          <button onClick={handleMarkAllRead} style={{ marginLeft: 'auto', padding: '6px 14px', borderRadius: 20, border: '1px solid var(--border-light)', background: 'var(--bg-glass)', color: 'var(--color-text-primary)', fontSize: 12, cursor: 'pointer' }}>
+          <button onClick={handleMarkAllRead} className="notif-mark-all">
             Mark all read
           </button>
         )}
       </div>
 
       {filtered.length === 0 ? (
-        <p style={{ color: 'var(--color-text-placeholder)', textAlign: 'center', padding: 40 }}>No notifications yet</p>
+        <p className="notif-empty">No notifications yet</p>
       ) : (
         filtered.map((n) => (
           <div
             key={n.id}
             onClick={() => { if (!n.read) handleMarkRead(n.id); }}
-            className="feed-post-wrapper"
-            style={{
-              padding: '16px 20px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14,
-              opacity: n.read ? 0.6 : 1,
-            }}
+            className={`feed-post-wrapper notif-item${n.read ? ' notif-item--read' : ''}`}
           >
-            <div style={{
-              width: 40, height: 40, borderRadius: '50%',
+            <div className="notif-icon-avatar" style={{
               background: `linear-gradient(135deg, ${NOTIF_COLORS[n.type] || '#7B4DFF'}, var(--border-medium))`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-              fontSize: 13, fontWeight: 700, color: 'var(--color-text-white)',
+              color: 'var(--color-text-white)',
             }}>
               {(n.fromUserName || '?').charAt(0).toUpperCase()}
             </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontSize: 14, color: 'var(--color-text-primary)', lineHeight: 1.4 }}>
+            <div className="notif-body">
+              <p className="notif-message">
                 <strong style={{ color: 'var(--color-text-primary)' }}>{n.fromUserName}</strong>{' '}{n.message}
               </p>
-              <span style={{ fontSize: 12, color: 'var(--color-text-placeholder)', marginTop: 2, display: 'block' }}>
+              <span className="notif-time">
                 {formatTime(n.createdAt)}
               </span>
             </div>
-            <div style={{
-              width: 36, height: 36, borderRadius: 10, background: 'var(--bg-glass)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            }}>
+            <div className="notif-icon">
               {iconMap[n.type]}
             </div>
           </div>

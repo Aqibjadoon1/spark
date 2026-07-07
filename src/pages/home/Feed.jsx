@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import useAuth from '../../hooks/useAuth';
 import useUsers from '../../hooks/useUsers';
@@ -16,6 +17,7 @@ import Skeleton from '../../components/globals/Skeleton';
 
 const Feed = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const { user } = useAuth();
   const { users } = useUsers();
   const { posts, loading, error, createPost, updatePost, deletePost, reactToPost, removeReaction, addComment } = usePosts();
@@ -31,6 +33,13 @@ const Feed = () => {
   useEffect(() => {
     if (error) dispatch(showToast(error, 'error'));
   }, [error, dispatch]);
+
+  useEffect(() => {
+    if (location.state?.openForm) {
+      setShowForm(true);
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const currentUserProfile = users.find((u) => u.uid === user?.uid) || {};
   const bookmarkedPostIds = currentUserProfile.bookmarks || [];

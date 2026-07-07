@@ -112,8 +112,8 @@ const Settings = () => {
   });
 
   return (
-    <div className="dashboard-content" style={{ maxWidth: '42rem', margin: '0 auto' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+    <div className="dashboard-content settings-page">
+      <div className="settings-header">
         <div className="section-header">
           <h1>Settings</h1>
           <p>Customize your experience</p>
@@ -129,11 +129,11 @@ const Settings = () => {
         </button>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <div className="settings-section">
         <section className="panel-card">
           <h2 className="panel-card-title" style={{ marginBottom: '1rem' }}>Appearance</h2>
           <div>
-            <label style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--color-text-secondary)', display: 'block', marginBottom: '0.75rem' }}>Theme</label>
+            <label className="settings-label">Theme</label>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
               {['dark', 'light'].map((t) => (
                 <button
@@ -152,17 +152,17 @@ const Settings = () => {
         <section className="panel-card">
           <h2 className="panel-card-title" style={{ marginBottom: '1rem' }}>Privacy</h2>
           <div>
-            <label htmlFor="settings-visibility" style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--color-text-secondary)', display: 'block', marginBottom: '0.375rem' }}>
+            <label htmlFor="settings-visibility" className="settings-label">
               Profile Visibility
             </label>
-            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginBottom: '0.75rem' }}>
+            <p className="settings-description">
               Private profiles hide personal details and posts from non-friends.
             </p>
             <select
               id="settings-visibility"
               value={visibility}
               onChange={(e) => setVisibility(e.target.value)}
-              style={{ width: '100%', padding: '0.625rem 1rem', background: 'var(--bg-surface-raised)', borderRadius: '0.75rem', border: '1px solid var(--border-medium)', fontSize: '0.875rem', color: 'var(--color-text-primary)' }}
+              className="settings-select"
               aria-label="Profile visibility"
             >
               <option value="public">Public</option>
@@ -180,25 +180,25 @@ const Settings = () => {
               { key: 'friendRequests', label: 'Friend Requests' },
               { key: 'messages', label: 'Messages' },
             ].map(({ key, label }) => (
-              <div key={key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>{label}</span>
+              <div key={key} className="settings-toggle-row">
+                <span className="settings-page-label">{label}</span>
                 <button
                   onClick={() => setNotifications((prev) => ({ ...prev, [key]: !prev[key] }))}
-                  style={toggleStyle(notifications[key])}
+                  className={`settings-toggle${notifications[key] ? ' settings-toggle--on' : ' settings-toggle--off'}`}
                   role="switch"
                   aria-checked={notifications[key]}
                   aria-label={`${label} notifications`}
                 >
-                  <span style={toggleCircleStyle(notifications[key])} />
+                  <span className={`settings-toggle-circle${notifications[key] ? ' settings-toggle-circle--on' : ' settings-toggle-circle--off'}`} />
                 </button>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="panel-card" style={{ border: '1px solid var(--color-danger)' }}>
-          <h2 className="panel-card-title" style={{ color: 'var(--color-danger)', marginBottom: '1rem' }}>Danger Zone</h2>
-          <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>
+        <section className="panel-card settings-danger-zone">
+          <h2 className="panel-card-title settings-danger-title">Danger Zone</h2>
+          <p className=""> 
             Once you delete your account, there is no going back. Please be certain.
           </p>
           <button className="btn btn-danger" onClick={() => setShowDeleteConfirm(true)}>
@@ -208,13 +208,13 @@ const Settings = () => {
       </div>
 
       {showDeleteConfirm && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-overlay)', padding: '1rem' }}>
-          <div style={{ background: 'var(--bg-surface)', borderRadius: '0.75rem', padding: '1.5rem', maxWidth: '24rem', width: '100%', boxShadow: '0 25px 50px var(--shadow-card)', border: '1px solid var(--border-light)' }}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--color-text-primary)' }}>Delete Account?</h3>
-            <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)', marginBottom: '1.5rem' }}>
+        <div className="settings-delete-backdrop">
+          <div className="settings-delete-dialog">
+            <h3 className="settings-delete-title">Delete Account?</h3>
+            <p className="settings-delete-text">
               This action is permanent and cannot be undone. All your data will be removed.
             </p>
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <div className="settings-delete-actions">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 className="btn btn-secondary"

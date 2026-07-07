@@ -114,7 +114,7 @@ const Login = () => {
         </div>
 
         <div className="auth-forgot-row">
-          <button type="button" className="auth-forgot-link" onClick={goForgot} style={{ background: 'linear-gradient(135deg, #7B4DFF, #FF3FA7)', color: '#FFF', border: 'none', borderRadius: 14, padding: '8px 18px', fontSize: 13, fontWeight: 700, fontFamily: "'Inter', sans-serif", cursor: 'pointer', boxShadow: '0 4px 15px var(--shadow-glow-pink)', transition: 'all 0.3s ease', display: 'inline-block' }}>Forgot password?</button>
+          <button type="button" className="auth-forgot-link" onClick={goForgot} style={{ background: 'linear-gradient(135deg, #ff4b89, #bb0058)', color: '#590026', border: 'none', borderRadius: 14, padding: '8px 18px', fontSize: 13, fontWeight: 700, fontFamily: "'Inter', sans-serif", cursor: 'pointer', boxShadow: '0 0 15px rgba(255,177,195,0.4)', transition: 'all 0.3s ease', display: 'inline-block' }}>Forgot password?</button>
         </div>
 
         <button type="submit" className="auth-submit-btn" disabled={loading}>
@@ -139,7 +139,7 @@ const Login = () => {
       </button>
 
       <div className="auth-footer" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-        <button type="button" onClick={goRegister} style={{ background: 'linear-gradient(135deg, #7B4DFF, #FF3FA7)', color: '#FFF', border: 'none', borderRadius: 14, padding: '10px 28px', fontSize: 13, fontWeight: 700, fontFamily: "'Inter', sans-serif", cursor: 'pointer', boxShadow: '0 4px 15px var(--shadow-glow-pink)', transition: 'all 0.3s ease', display: 'inline-block' }}>Sign up</button>
+        <button type="button" onClick={goRegister} style={{ background: 'linear-gradient(135deg, #ff4b89, #bb0058)', color: '#590026', border: 'none', borderRadius: 14, padding: '10px 28px', fontSize: 13, fontWeight: 700, fontFamily: "'Inter', sans-serif", cursor: 'pointer', boxShadow: '0 0 15px rgba(255,177,195,0.4)', transition: 'all 0.3s ease', display: 'inline-block' }}>Sign up</button>
         <span className="auth-footer-text">
           Don&apos;t have an account?{' '}
           <button type="button" className="auth-footer-link" onClick={goRegister}>Sign up</button>

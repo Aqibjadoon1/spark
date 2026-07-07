@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Elite Social - Feed</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Space+Grotesk:wght@500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "tertiary-fixed-dim": "#a1d800",
+                "on-secondary-container": "#006a6f",
+                "background": "#131319",
+                "surface-variant": "#35343b",
+                "on-primary-fixed-variant": "#8f0041",
+                "on-primary-fixed": "#3f0019",
+                "error": "#ffb4ab",
+                "surface": "#131319",
+                "on-primary": "#66002c",
+                "secondary-fixed": "#6ff6ff",
+                "secondary-fixed-dim": "#00dce6",
+                "tertiary-container": "#759e00",
+                "outline": "#ac878f",
+                "primary": "#ffb1c3",
+                "primary-fixed": "#ffd9e0",
+                "on-primary-container": "#590026",
+                "tertiary-fixed": "#b8f600",
+                "outline-variant": "#5c3f45",
+                "primary-fixed-dim": "#ffb1c3",
+                "on-tertiary-fixed-variant": "#384e00",
+                "on-error-container": "#ffdad6",
+                "on-surface": "#e4e1ea",
+                "surface-container-high": "#2a2930",
+                "surface-container-highest": "#35343b",
+                "inverse-primary": "#bb0058",
+                "on-secondary-fixed": "#002022",
+                "surface-bright": "#393840",
+                "inverse-surface": "#e4e1ea",
+                "surface-tint": "#ffb1c3",
+                "on-tertiary-container": "#202e00",
+                "on-error": "#690005",
+                "on-secondary-fixed-variant": "#004f53",
+                "on-background": "#e4e1ea",
+                "error-container": "#93000a",
+                "on-secondary": "#00373a",
+                "secondary-container": "#00f1fd",
+                "surface-container": "#1f1f26",
+                "surface-container-low": "#1b1b22",
+                "inverse-on-surface": "#303037",
+                "tertiary": "#a1d800",
+                "on-tertiary-fixed": "#141f00",
+                "primary-container": "#ff4b89",
+                "on-tertiary": "#263500",
+                "secondary": "#dcfdff",
+                "surface-container-lowest": "#0e0e14",
+                "on-surface-variant": "#e5bcc4",
+                "surface-dim": "#131319"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "margin-desktop": "40px",
+                "margin-mobile": "20px",
+                "container-max": "1280px",
+                "base": "4px",
+                "gutter": "16px"
+        },
+        "fontFamily": {
+                "headline-md": [
+                        "Space Grotesk"
+                ],
+                "label-caps": [
+                        "JetBrains Mono"
+                ],
+                "body-md": [
+                        "Geist"
+                ],
+                "code-sm": [
+                        "JetBrains Mono"
+                ],
+                "display-lg-mobile": [
+                        "Space Grotesk"
+                ],
+                "display-lg": [
+                        "Space Grotesk"
+                ]
+        },
+        "fontSize": {
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "label-caps": [
+                        "12px",
+                        {
+                                "lineHeight": "1.0",
+                                "letterSpacing": "0.15em",
+                                "fontWeight": "500"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "1.6",
+                                "letterSpacing": "0em",
+                                "fontWeight": "400"
+                        }
+                ],
+                "code-sm": [
+                        "13px",
+                        {
+                                "lineHeight": "1.5",
+                                "fontWeight": "400"
+                        }
+                ],
+                "display-lg-mobile": [
+                        "32px",
+                        {
+                                "lineHeight": "1.1",
+                                "letterSpacing": "-0.04em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "1.1",
+                                "letterSpacing": "-0.04em",
+                                "fontWeight": "700"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        /* Base styles & utilities */
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Glassmorphism utilities */
+        .glass-card {
+            background: rgba(42, 41, 48, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 177, 195, 0.1);
+            border-top-color: rgba(255, 177, 195, 0.2);
+            border-left-color: rgba(255, 177, 195, 0.2);
+            box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.6);
+        }
+        
+        .glass-input {
+            background: rgba(27, 27, 34, 0.6);
+            border: 1px solid rgba(255, 177, 195, 0.15);
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: theme('colors.surface-variant');
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: theme('colors.outline-variant');
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen overflow-x-hidden font-body-md text-body-md">
+<!-- TopAppBar (Mobile & Tablet) -->
+<header class="fixed top-0 right-0 left-0 lg:hidden h-16 z-40 bg-background/80 dark:bg-background/80 backdrop-blur-md flex justify-between items-center px-6 border-b border-primary/20">
+<div class="font-headline-md text-headline-md font-bold text-primary tracking-tight">
+            Elite Social
+        </div>
+<div class="flex items-center gap-4 text-primary">
+<button class="hover:bg-surface-container-high/50 rounded-full p-2 transition-all focus:ring-2 focus:ring-primary/50">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="hover:bg-surface-container-high/50 rounded-full p-2 transition-all focus:ring-2 focus:ring-primary/50">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant/30">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="A stylized digital avatar of a young gamer with vibrant pink hair and glowing green headphones against a dark cybercity background. The lighting is cinematic and moody, fitting a high-end gaming aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDnH3VstFO9DVnXEkOkmQFYzL7HAaLfQQ5NCDJ2eF-OqGCuIn1JIaS4ISziQPmwAoMapt3t-F0q6GMeFBNCuo5QB3-MjS_ZKxR2Sb_jr6cxsycxTEdmaUGdahaz4zRuoeDAzEoelqNcpgsvtXq6JUJsmSPMU63aj-ETJnPt-3goArx5OoRi23C16dKh4DmtlP_mt7-px-P6T7DMZpUw3lVmBAJt3o0VG892k4d0pQJEf1HGkz9ABcH"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Desktop) -->
+<nav class="w-64 h-screen fixed left-0 top-0 hidden lg:flex flex-col bg-background dark:bg-background border-r border-primary/20 dark:border-primary/20 z-50">
+<div class="flex flex-col justify-between py-8 h-full">
+<div>
+<!-- Brand Anchor -->
+<div class="px-8 mb-10 flex flex-col">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined filled text-primary text-3xl drop-shadow-[0_0_8px_rgba(255,177,195,0.6)]">sports_esports</span>
+<span class="font-headline-md text-headline-md font-bold text-primary tracking-tight drop-shadow-[0_0_8px_rgba(255,177,195,0.3)]">Elite Social</span>
+</div>
+<span class="font-code-sm text-code-sm text-secondary-fixed mt-1 pl-11 uppercase tracking-widest">Pro Gaming Network</span>
+</div>
+<!-- Navigation Links -->
+<ul class="space-y-2">
+<li>
+<a class="flex items-center gap-4 px-6 py-3 bg-primary-container/10 dark:bg-primary-container/20 text-primary font-bold border-r-4 border-primary hover:bg-surface-container-highest/50 dark:hover:bg-surface-container-highest/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined filled">dynamic_feed</span>
+<span class="font-label-caps text-label-caps">Feed</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:text-secondary-fixed transition-colors hover:bg-surface-container-highest/50 dark:hover:bg-surface-container-highest/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-caps text-label-caps">Explore</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:text-secondary-fixed transition-colors hover:bg-surface-container-highest/50 dark:hover:bg-surface-container-highest/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-caps text-label-caps">Friends</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:text-secondary-fixed transition-colors hover:bg-surface-container-highest/50 dark:hover:bg-surface-container-highest/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-caps text-label-caps">Nearby</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:text-secondary-fixed transition-colors hover:bg-surface-container-highest/50 dark:hover:bg-surface-container-highest/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-label-caps text-label-caps">Messages</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:text-secondary-fixed transition-colors hover:bg-surface-container-highest/50 dark:hover:bg-surface-container-highest/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">bookmark</span>
+<span class="font-label-caps text-label-caps">Bookmarks</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:text-secondary-fixed transition-colors hover:bg-surface-container-highest/50 dark:hover:bg-surface-container-highest/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-label-caps text-label-caps">Notifications</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:text-secondary-fixed transition-colors hover:bg-surface-container-highest/50 dark:hover:bg-surface-container-highest/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">person_pin</span>
+<span class="font-label-caps text-label-caps">Profile</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:text-secondary-fixed transition-colors hover:bg-surface-container-highest/50 dark:hover:bg-surface-container-highest/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-4 px-6 py-3 text-on-surface-variant hover:text-secondary-fixed transition-colors hover:bg-surface-container-highest/50 dark:hover:bg-surface-container-highest/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</li>
+</ul>
+<div class="px-6 mt-8">
+<button class="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-primary-container to-inverse-primary text-on-primary-container font-label-caps text-label-caps font-bold shadow-[0_0_15px_rgba(255,177,195,0.4)] hover:shadow-[0_0_25px_rgba(255,177,195,0.7)] transition-all duration-300">
+                        + New Post
+                    </button>
+</div>
+</div>
+<div class="px-6">
+<a class="flex items-center gap-4 px-4 py-3 text-on-surface-variant hover:text-error transition-colors rounded-lg hover:bg-error-container/10" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-caps text-label-caps">Logout</span>
+</a>
+</div>
+</div>
+</nav>
+<!-- BottomNavBar (Mobile) -->
+<nav class="fixed bottom-0 w-full z-50 lg:hidden rounded-t-xl bg-surface-container dark:bg-surface-container-lowest backdrop-blur-xl border-t border-primary/20 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+<div class="flex justify-around items-center h-16 w-full px-2">
+<a class="flex flex-col items-center justify-center text-primary bg-primary-container/10 rounded-xl px-4 py-1 active:bg-surface-variant transition-all" href="#">
+<span class="material-symbols-outlined filled">dynamic_feed</span>
+<span class="font-code-sm text-code-sm">Feed</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant transition-all rounded-xl px-4 py-1" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-code-sm text-code-sm">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant transition-all rounded-xl px-4 py-1" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-code-sm text-code-sm">Friends</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant transition-all rounded-xl px-4 py-1" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-code-sm text-code-sm">Nearby</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant active:bg-surface-variant transition-all rounded-xl px-4 py-1" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-code-sm text-code-sm">Messages</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="lg:ml-64 pt-20 lg:pt-8 pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto flex flex-col xl:flex-row gap-8">
+<!-- Feed Column -->
+<div class="flex-1 max-w-3xl">
+<header class="mb-8">
+<h1 class="font-display-lg-mobile lg:font-display-lg text-display-lg-mobile lg:text-display-lg text-primary mb-2 drop-shadow-[0_0_10px_rgba(255,177,195,0.4)]">Feed</h1>
+<p class="font-code-sm text-code-sm text-secondary-fixed">See what's happening in your community</p>
+</header>
+<!-- Composer -->
+<div class="glass-card rounded-xl p-6 mb-8">
+<div class="flex gap-4">
+<div class="w-12 h-12 rounded-full overflow-hidden flex-shrink-0 border-2 border-secondary-container p-0.5 shadow-[0_0_10px_rgba(0,241,253,0.5)]">
+<div class="w-full h-full rounded-full overflow-hidden">
+<img alt="Current User" class="w-full h-full object-cover" data-alt="A portrait of a male gamer in a dimly lit room with neon blue accents, wearing a serious expression and high-end gaming headset. Professional esports photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsCEV9PPf0ZDkHhOKkIVPkU1AYDs90ajJ2agq8DXllOuYWyloTtYMMuLsOoXA-_ToqPQ_gyoVgO9p6tdI5Hubr8MBPqgJYAfNnYBhpwBGaNdsM_n2iQxLXTbGShS_jtN7AsmrP6mN1k1HrQWX0wLTDBFFbv2OPvucuhFiMaOOZGiFa4D8uNI1BHJri4rGijRxWoYhtbgiWXoniC4NCvwUTKouAQqNIoExCdGpBCsS6NqbSON2NnuIK"/>
+</div>
+</div>
+<div class="flex-1">
+<textarea class="w-full bg-surface-container-low border border-primary/20 rounded-lg p-4 font-body-md text-body-md text-on-surface placeholder:text-on-surface-variant/50 focus:ring-1 focus:ring-secondary-fixed focus:border-secondary-fixed transition-all resize-none h-16 min-h-[64px] shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]" placeholder="What's on your mind?"></textarea>
+<div class="flex justify-between items-center mt-4">
+<div class="flex gap-2">
+<button class="p-2 text-on-surface-variant hover:text-secondary-fixed hover:bg-secondary-container/20 rounded-full transition-colors" title="Add Media">
+<span class="material-symbols-outlined">image</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-secondary-fixed hover:bg-secondary-container/20 rounded-full transition-colors" title="Add Game Tag">
+<span class="material-symbols-outlined">sports_esports</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-secondary-fixed hover:bg-secondary-container/20 rounded-full transition-colors" title="Location">
+<span class="material-symbols-outlined">location_on</span>
+</button>
+</div>
+<button class="px-6 py-2 bg-primary-container text-on-primary-container rounded-lg font-label-caps text-label-caps hover:shadow-[0_0_15px_rgba(255,75,137,0.5)] transition-all font-bold">Post</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Filters -->
+<div class="flex gap-4 mb-6">
+<select class="glass-input rounded-lg px-4 py-2 text-on-surface font-label-caps text-label-caps focus:ring-1 focus:ring-secondary-fixed outline-none border-primary/20">
+<option class="bg-surface" value="newest">Newest First</option>
+<option class="bg-surface" value="popular">Most Popular</option>
+<option class="bg-surface" value="trending">Trending</option>
+</select>
+<select class="glass-input rounded-lg px-4 py-2 text-on-surface font-label-caps text-label-caps focus:ring-1 focus:ring-secondary-fixed outline-none border-primary/20">
+<option class="bg-surface" value="all">All Categories</option>
+<option class="bg-surface" value="clips">Clips</option>
+<option class="bg-surface" value="discussion">Discussion</option>
+</select>
+</div>
+<!-- Posts Stream -->
+<div class="space-y-6">
+<!-- Post 1 -->
+<article class="glass-card rounded-xl p-6 lg:p-8">
+<!-- Post Header -->
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-4 items-center">
+<div class="w-12 h-12 rounded-full border-2 border-tertiary-fixed p-0.5 relative shadow-[0_0_10px_rgba(184,246,0,0.4)]">
+<img alt="User avatar" class="w-full h-full rounded-full object-cover" data-alt="An artistic digital portrait of a female character with glowing neon geometric tattoos, styled like a futuristic cyberpunk operative. Dark background with subtle teal rim lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHesxwPHBO4ekk_Jy1fL4qIo0iSWTP4Y93aajE5ii0U8v_xJ19JFh-avpyuAo3lu4eD3IjJjYwedn-KV_0Ao78Q0cAr8hiu1HBO8xDJa_zfCMt3CDhddJJ4_wKchj6BFH7s5OlARtGy5dkdfZJoxwlt9tTm3oZ_KLXfp-frrtk2JEV1FSteLO6Bh0FuB8KeZh5cd4lzuj6vQDHEp-4Lu3yxPOwMJfMtuvNqznZ2ZK7zeo76le7cMAr"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-tertiary-fixed rounded-full border-2 border-surface shadow-[0_0_5px_#b8f600]"></div>
+</div>
+<div>
+<h3 class="font-label-caps text-label-caps text-primary flex items-center gap-2">
+                                    NeonNinja
+                                    <span class="bg-tertiary-container text-on-tertiary-container text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Pro</span>
+</h3>
+<span class="font-code-sm text-code-sm text-secondary-fixed/70 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">schedule</span> 2h ago
+                                </span>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-primary p-1 transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Post Content -->
+<div class="mb-6">
+<p class="font-body-md text-body-md text-on-surface mb-4 leading-relaxed">
+                            Just hit Immortal rank after grinding for 12 hours straight. The new meta is actually insane once you figure out the rotation timing. Anyone else climbing tonight? 🚀
+                        </p>
+<!-- Tags -->
+<div class="flex gap-2 mb-4">
+<span class="bg-surface-container-high border border-secondary-fixed/30 text-secondary-fixed px-3 py-1 rounded-full font-code-sm text-code-sm shadow-[0_0_5px_rgba(0,241,253,0.2)]">#RankedGrind</span>
+<span class="bg-surface-container-high border border-secondary-fixed/30 text-secondary-fixed px-3 py-1 rounded-full font-code-sm text-code-sm shadow-[0_0_5px_rgba(0,241,253,0.2)]">#Immortal</span>
+</div>
+</div>
+<!-- Post Actions -->
+<div class="flex items-center justify-between border-t border-primary/10 pt-4">
+<div class="flex gap-4 sm:gap-6">
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors group">
+<span class="material-symbols-outlined group-hover:filled">thumb_up</span>
+<span class="font-code-sm text-code-sm">1.2k</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-secondary-fixed transition-colors group">
+<span class="material-symbols-outlined group-hover:filled">chat_bubble</span>
+<span class="font-code-sm text-code-sm">342</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-tertiary-fixed transition-colors group">
+<span class="material-symbols-outlined group-hover:filled">share</span>
+<span class="font-code-sm text-code-sm hidden sm:inline">Share</span>
+</button>
+</div>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors group">
+<span class="material-symbols-outlined group-hover:filled">bookmark</span>
+<span class="font-code-sm text-code-sm hidden sm:inline">Save</span>
+</button>
+</div>
+</article>
+<!-- Post 2 (Media) -->
+<article class="glass-card rounded-xl p-6 lg:p-8">
+<!-- Post Header -->
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-4 items-center">
+<div class="w-12 h-12 rounded-full border-2 border-primary/50 p-0.5">
+<img alt="User avatar" class="w-full h-full rounded-full object-cover" data-alt="A stylized 3D render of a futuristic robot head with glowing orange eyes, acting as an avatar logo for a gamer. High contrast, dark background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBP54MN3wsuNr9IroqWHHS6NWYB2VtdFPqtVqUyWHitWUBTxybo4f_h4TB20vRJQLX89Z8tefRibov1oZCEpExloXRYkoSRh9zWmN5kIEXzXT2lSW8BMeRCDy3wlRrihpigw9ISjqhqVexaieYOLZKa3sZiAcIhleBY3EwTXc6OhrBs45xSXqv-hU0f6hWaT58EygMJe9nBfz9cz1bMo1ggIhEOG7k7lcMBvBWF3hQolhmXjOcLLgWy"/>
+</div>
+<div>
+<h3 class="font-label-caps text-label-caps text-primary">MechWarrior99</h3>
+<span class="font-code-sm text-code-sm text-secondary-fixed/70">5h ago</span>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-primary p-1 transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Post Content -->
+<div class="mb-6">
+<p class="font-body-md text-body-md text-on-surface mb-4">
+                            Check out this incredible setup from the weekend LAN party. Cable management is finally sorted!
+                        </p>
+<!-- Rich Media (Image) -->
+<div class="rounded-lg overflow-hidden border border-primary/30 mb-4 relative group shadow-[0_0_15px_rgba(255,177,195,0.2)]">
+<img alt="Gaming Setup" class="w-full h-auto object-cover max-h-[400px]" data-alt="A high-end, multi-monitor gaming setup in a dark room illuminated by vibrant purple and blue RGB lighting. Features a custom water-cooled PC chassis, mechanical keyboard, and premium studio monitors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0LkDuBOVUrQKKQ0Ge34EyZeK_Pu8jQqpUotTaYRsUvOZX4jQTgxzW4K5o254fXassxFvhduF4cV41ECICT7Rrecqr1OgyMxpUasDbxaXrUknHAyPeeTUUb7NAdNztFJK-fIj48z-zK5hnY0VhGdV1jEd22DDzRP9nEnDJ4W6-pyeP3IXX7rR7hWN8T3xcnFNfdHPIAwsKrZUxOsCSl6dvko9qr6qHNgDqjvCEl3Jf2QlY3mCcZBHQ"/>
+<div class="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
+<button class="opacity-0 group-hover:opacity-100 bg-background/80 backdrop-blur p-3 rounded-full text-secondary-fixed border border-secondary-fixed/50 hover:bg-secondary-fixed hover:text-on-secondary-fixed transition-all transform scale-90 group-hover:scale-100 shadow-[0_0_10px_rgba(0,241,253,0.5)]">
+<span class="material-symbols-outlined">fullscreen</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Post Actions -->
+<div class="flex items-center justify-between border-t border-primary/10 pt-4">
+<div class="flex gap-4 sm:gap-6">
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors group">
+<span class="material-symbols-outlined group-hover:filled">thumb_up</span>
+<span class="font-code-sm text-code-sm">856</span>
+</button>
+<button class="flex items-center gap-2 text-on-surface-variant hover:text-secondary-fixed transition-colors group">
+<span class="material-symbols-outlined group-hover:filled">chat_bubble</span>
+<span class="font-code-sm text-code-sm">124</span>
+</button>
+</div>
+</div>
+</article>
+</div>
+</div>
+<!-- Sidebar (Desktop/XL) -->
+<aside class="hidden xl:block w-80 space-y-6 pt-16">
+<!-- Trending Card -->
+<div class="glass-card rounded-xl p-6 border-t-2 border-t-primary/50">
+<h3 class="font-headline-md text-[18px] font-bold text-primary mb-4 flex items-center gap-2 drop-shadow-[0_0_5px_rgba(255,177,195,0.5)]">
+<span class="material-symbols-outlined text-primary">local_fire_department</span>
+                    Trending Topics
+                </h3>
+<ul class="space-y-4">
+<li>
+<a class="block group" href="#">
+<span class="font-code-sm text-code-sm text-secondary-fixed/70 block mb-1">Esports • Trending</span>
+<span class="font-label-caps text-label-caps text-on-surface group-hover:text-primary transition-colors">World Championship Finals</span>
+<span class="font-code-sm text-code-sm text-secondary-fixed/50 block mt-1">45.2K posts</span>
+</a>
+</li>
+<li>
+<a class="block group" href="#">
+<span class="font-code-sm text-code-sm text-secondary-fixed/70 block mb-1">Gaming • Live</span>
+<span class="font-label-caps text-label-caps text-on-surface group-hover:text-primary transition-colors">Patch Notes v4.2 Discussion</span>
+<span class="font-code-sm text-code-sm text-secondary-fixed/50 block mt-1">12.5K posts</span>
+</a>
+</li>
+<li>
+<a class="block group" href="#">
+<span class="font-code-sm text-code-sm text-secondary-fixed/70 block mb-1">Hardware • Trending</span>
+<span class="font-label-caps text-label-caps text-on-surface group-hover:text-primary transition-colors">Next-Gen GPU Leaks</span>
+<span class="font-code-sm text-code-sm text-secondary-fixed/50 block mt-1">8.9K posts</span>
+</a>
+</li>
+</ul>
+<button class="w-full mt-6 py-2 text-secondary-fixed font-label-caps text-label-caps hover:bg-secondary-container/20 rounded-lg transition-colors border border-secondary-fixed/30 hover:border-secondary-fixed shadow-[inset_0_0_10px_rgba(0,241,253,0)] hover:shadow-[inset_0_0_10px_rgba(0,241,253,0.2)]">Show More</button>
+</div>
+<!-- Suggested Friends -->
+<div class="glass-card rounded-xl p-6 border-t-2 border-t-secondary-fixed/50">
+<h3 class="font-headline-md text-[18px] font-bold text-secondary-fixed mb-4 flex items-center gap-2 drop-shadow-[0_0_5px_rgba(0,241,253,0.5)]">
+<span class="material-symbols-outlined text-secondary-fixed">person_add</span>
+                    Suggested for you
+                </h3>
+<ul class="space-y-4">
+<li class="flex items-center justify-between">
+<div class="flex gap-3 items-center">
+<img alt="User" class="w-10 h-10 rounded-full object-cover border border-secondary-fixed/50 shadow-[0_0_8px_rgba(0,241,253,0.3)]" data-alt="A portrait of a male esports player wearing a dark jersey with sponsor logos, standing confidently under dramatic stadium lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeQY1HA5yCL2uaNQw6F6otCdqHtdRpbPzXmlrcGyD4dctsA8NWYHsgzozCZhs2ORF576dxQ_3TqlEWL7N0n0FdldydzxuIjnxIbhn4OXFi8UtdnPik2rTFBBBoucBMlbYSehlqWsLcCZ6sYrQzTF6-dbcem-ZkcWx6HLIqc_o26dxmlWpnPJt3S9S3NH7lLznBeJa0ZNvknIQuCzkv_6ewD0NK-hWJ0A70cCMM144ZJib21CQdIauB"/>
+<div>
+<span class="font-label-caps text-label-caps text-on-surface block">Alex_Pro</span>
+<span class="font-code-sm text-code-sm text-secondary-fixed/70">Follows you</span>
+</div>
+</div>
+<button class="px-3 py-1 bg-surface-container-high hover:bg-secondary-container hover:text-on-secondary-container text-secondary-fixed font-label-caps text-label-caps rounded-lg border border-secondary-fixed/30 transition-all shadow-[0_0_5px_rgba(0,241,253,0.1)] hover:shadow-[0_0_10px_rgba(0,241,253,0.4)]">Follow</button>
+</li>
+<li class="flex items-center justify-between">
+<div class="flex gap-3 items-center">
+<img alt="User" class="w-10 h-10 rounded-full object-cover border border-secondary-fixed/50 shadow-[0_0_8px_rgba(0,241,253,0.3)]" data-alt="A stylized vector illustration of a female gamer with large purple glasses and a headset, vibrant flat colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6TphnPgE_ZjalrJ4T9vGdq3gz1Ojz10UVpABtWdQe2AKYTiM-rKqmJsupww89qWdElN7fuCosHXV03_FqPT8INsUH1HEuQ4KMvKOZ1C9wYOTGDWVot1GmDPU6rYxikbosFuSqxs5dTPOK_PoVRwnZwNq5r6qmZi1KvPt9lVLv15qmCkJCQ_9QMGtsBuJA5v9Zyg8VggZWqAXXYee2dyy0PLzNITp3_oBquI3QhUeP_mBgmeCk4dKp"/>
+<div>
+<span class="font-label-caps text-label-caps text-on-surface block">SarahSnipe</span>
+<span class="font-code-sm text-code-sm text-secondary-fixed/70">New to Elite</span>
+</div>
+</div>
+<button class="px-3 py-1 bg-surface-container-high hover:bg-secondary-container hover:text-on-secondary-container text-secondary-fixed font-label-caps text-label-caps rounded-lg border border-secondary-fixed/30 transition-all shadow-[0_0_5px_rgba(0,241,253,0.1)] hover:shadow-[0_0_10px_rgba(0,241,253,0.4)]">Follow</button>
+</li>
+</ul>
+</div>
+<!-- Mini Footer -->
+<div class="pt-4 flex flex-wrap gap-x-4 gap-y-2 px-2">
+<a class="font-code-sm text-code-sm text-on-surface-variant hover:text-primary transition-colors" href="#">About</a>
+<a class="font-code-sm text-code-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="font-code-sm text-code-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms</a>
+<span class="font-code-sm text-code-sm text-outline-variant w-full mt-2">© 2026 Elite Social</span>
+</div>
+</aside>
+</main>
+</body></html>

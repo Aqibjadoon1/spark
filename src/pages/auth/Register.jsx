@@ -193,7 +193,7 @@ const Register = () => {
       </button>
 
       <div className="auth-footer" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-        <button type="button" onClick={goLogin} style={{ background: 'linear-gradient(135deg, #7B4DFF, #FF3FA7)', color: '#FFF', border: 'none', borderRadius: 14, padding: '10px 28px', fontSize: 13, fontWeight: 700, fontFamily: "'Inter', sans-serif", cursor: 'pointer', boxShadow: '0 4px 15px var(--shadow-glow-pink)', transition: 'all 0.3s ease', display: 'inline-block' }}>Sign in</button>
+        <button type="button" onClick={goLogin} style={{ background: 'linear-gradient(135deg, #ff4b89, #bb0058)', color: '#590026', border: 'none', borderRadius: 14, padding: '10px 28px', fontSize: 13, fontWeight: 700, fontFamily: "'Inter', sans-serif", cursor: 'pointer', boxShadow: '0 0 15px rgba(255,177,195,0.4)', transition: 'all 0.3s ease', display: 'inline-block' }}>Sign in</button>
         <span className="auth-footer-text">
           Already have an account?{' '}
           <button type="button" className="auth-footer-link" onClick={goLogin}>Sign in</button>

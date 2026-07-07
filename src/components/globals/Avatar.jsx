@@ -15,7 +15,7 @@ const Avatar = ({ src, name = '', size = 'md', online = false }) => {
   }, [name]);
 
   return (
-    <div className={`relative rounded-full overflow-hidden shrink-0 ${sizes[size]}`}>
+    <div className={`avatar ${sizes[size]}`}>
       {src ? (
         <img
           src={src}
@@ -24,7 +24,7 @@ const Avatar = ({ src, name = '', size = 'md', online = false }) => {
         />
       ) : (
         <div
-          className="w-full h-full bg-lime/20 text-lime flex items-center justify-center font-semibold text-sm"
+          className="avatar-placeholder"
           aria-label={name || 'Unknown user'}
         >
           {initials}
@@ -32,7 +32,7 @@ const Avatar = ({ src, name = '', size = 'md', online = false }) => {
       )}
       {online && (
         <span
-          className="absolute bottom-0 right-0 w-3 h-3 bg-lime rounded-full ring-2 ring-dark-bg"
+          className="avatar-online"
           aria-label="Online"
         />
       )}

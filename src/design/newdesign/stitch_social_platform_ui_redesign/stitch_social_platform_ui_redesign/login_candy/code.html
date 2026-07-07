@@ -1,0 +1,176 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Elite Social - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#80d0f0",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#fbf2fb",
+                        "surface": "#fef7ff",
+                        "outline-variant": "#dcc8e0",
+                        "on-secondary-fixed": "#1a1030",
+                        "inverse-primary": "#f0a0cc",
+                        "on-surface-variant": "#604868",
+                        "secondary-fixed-dim": "#c8a8e8",
+                        "on-tertiary-fixed": "#001a33",
+                        "on-tertiary-container": "#00334d",
+                        "tertiary-fixed": "#c8eaff",
+                        "on-background": "#2e1a28",
+                        "secondary": "#7c52aa",
+                        "primary-fixed": "#ffd6ee",
+                        "on-tertiary-fixed-variant": "#005580",
+                        "inverse-on-surface": "#fef7ff",
+                        "surface-container-highest": "#ece2ec",
+                        "surface-container": "#f8eef8",
+                        "on-secondary": "#ffffff",
+                        "surface-variant": "#f2e8f2",
+                        "on-surface": "#2e1a28",
+                        "on-primary-container": "#2e1a28",
+                        "primary-fixed-dim": "#f0a0cc",
+                        "on-error-container": "#9b1c1c",
+                        "error-container": "#ffe8e8",
+                        "tertiary-container": "#40c0ee",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-container": "#2e2040",
+                        "on-primary": "#ffffff",
+                        "surface-bright": "#fef7ff",
+                        "surface-tint": "#e040a0",
+                        "primary-container": "#f080c0",
+                        "inverse-surface": "#2e1a28",
+                        "secondary-container": "#eedcff",
+                        "on-error": "#ffffff",
+                        "surface-container-high": "#f2e8f2",
+                        "on-primary-fixed-variant": "#a02070",
+                        "background": "#fef7ff",
+                        "primary": "#e040a0",
+                        "secondary-fixed": "#eedcff",
+                        "on-primary-fixed": "#3d0028",
+                        "tertiary": "#0096cc",
+                        "outline": "#907898",
+                        "on-secondary-fixed-variant": "#4a3068",
+                        "error": "#e53e3e",
+                        "surface-dim": "#e0d6e0"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["DM Sans", "sans-serif"],
+                        "display": ["DM Sans", "sans-serif"],
+                        "body": ["DM Sans", "sans-serif"],
+                        "label": ["DM Sans", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'DM Sans', sans-serif; }
+        .bouncy-hover { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease; }
+        .bouncy-hover:hover { transform: scale(1.03); }
+        .shadow-primary-tint { box-shadow: 0 8px 24px rgba(224, 64, 160, 0.25); }
+        .shadow-primary-tint:hover { box-shadow: 0 12px 32px rgba(224, 64, 160, 0.35); }
+        .shadow-card { box-shadow: 0 16px 48px rgba(96, 72, 104, 0.08); }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex items-center justify-center p-4">
+<!-- Main Container - Split Layout -->
+<div class="max-w-6xl w-full bg-surface-container-lowest rounded-[2rem] shadow-card flex flex-col lg:flex-row overflow-hidden relative z-10">
+<!-- Left Side: Login Form -->
+<div class="w-full lg:w-1/2 p-8 md:p-16 flex flex-col justify-center">
+<div class="max-w-md w-full mx-auto">
+<!-- Brand -->
+<div class="flex items-center gap-3 mb-10">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center shadow-primary-tint">
+<span class="material-symbols-outlined text-on-primary text-xl" data-icon="sports_esports" data-weight="fill">sports_esports</span>
+</div>
+<h1 class="font-headline font-bold text-2xl text-on-background tracking-tight">Elite Social</h1>
+</div>
+<!-- Headers -->
+<div class="mb-8">
+<h2 class="font-headline font-bold text-4xl mb-3 text-on-background">Welcome back</h2>
+<p class="font-body text-on-surface-variant text-lg">Please enter your details to sign in.</p>
+</div>
+<!-- Social Login -->
+<div class="grid grid-cols-2 gap-4 mb-8">
+<button class="flex items-center justify-center gap-3 px-4 py-3 rounded-full border-2 border-surface-variant bg-surface hover:bg-surface-variant transition-colors bouncy-hover text-on-surface font-label font-medium">
+<svg class="w-5 h-5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path></svg>
+                        Google
+                    </button>
+<button class="flex items-center justify-center gap-3 px-4 py-3 rounded-full border-2 border-surface-variant bg-surface hover:bg-surface-variant transition-colors bouncy-hover text-on-surface font-label font-medium">
+<svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" fill-rule="evenodd"></path></svg>
+                        GitHub
+                    </button>
+</div>
+<div class="relative flex items-center py-5 mb-4">
+<div class="flex-grow border-t border-outline-variant"></div>
+<span class="flex-shrink-0 mx-4 text-on-surface-variant font-label text-sm">Or continue with</span>
+<div class="flex-grow border-t border-outline-variant"></div>
+</div>
+<!-- Form -->
+<form class="space-y-6">
+<div>
+<label class="block text-sm font-label font-medium text-on-background mb-2" for="email">Email address</label>
+<input class="w-full px-5 py-4 rounded-full bg-surface-container border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-body text-on-surface" id="email" placeholder="Enter your email" type="email">
+</div>
+<div>
+<label class="block text-sm font-label font-medium text-on-background mb-2" for="password">Password</label>
+<div class="relative">
+<input class="w-full px-5 py-4 rounded-full bg-surface-container border border-outline-variant focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-body text-on-surface" id="password" placeholder="••••••••" type="password">
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<input class="w-5 h-5 rounded-md text-primary bg-surface border-outline-variant focus:ring-primary/50 focus:ring-2" id="remember" type="checkbox">
+<label class="font-label text-sm text-on-surface-variant cursor-pointer" for="remember">Remember me</label>
+</div>
+<a class="font-label text-sm text-tertiary hover:text-tertiary-container transition-colors font-medium" href="#">Forgot password?</a>
+</div>
+<button class="w-full py-4 rounded-full bg-primary text-on-primary font-label font-bold text-lg bouncy-hover shadow-primary-tint" type="submit">
+                        Sign in
+                    </button>
+</form>
+<p class="mt-8 text-center font-body text-on-surface-variant">
+                    Don't have an account? <a class="font-bold text-primary hover:text-primary-container transition-colors" href="#">Sign up now</a>
+</p>
+</div>
+</div>
+<!-- Right Side: Graphic/Image -->
+<div class="hidden lg:block lg:w-1/2 relative bg-surface-container-high overflow-hidden">
+<!-- Referencing provided image -->
+
+<!-- Overlay for integration -->
+<div class="absolute inset-0 bg-gradient-to-tr from-primary via-secondary to-primary/60 z-10"></div>
+<!-- Decorative Elements -->
+<div class="absolute inset-0 z-20 flex flex-col items-center justify-center p-12 text-center pointer-events-none">
+<div class="w-24 h-24 bg-surface-container-lowest/20 backdrop-blur-xl rounded-3xl flex items-center justify-center mb-8 shadow-card transform rotate-12 bouncy-hover" style="pointer-events: auto;">
+<span class="material-symbols-outlined text-white text-5xl" data-icon="auto_awesome" data-weight="fill">auto_awesome</span>
+</div>
+<h3 class="font-headline font-bold text-4xl text-white mb-4 drop-shadow-lg">Connect with<br>Pro Gamers</h3>
+<p class="font-body text-surface text-lg max-w-md drop-shadow-md">Join the most vibrant community of competitive players. Share highlights, find squads, and dominate together.</p>
+<!-- Floating badges -->
+<div class="flex gap-3 mt-8">
+<span class="px-4 py-2 bg-primary-fixed text-on-primary-fixed rounded-full font-label text-sm shadow-lg font-bold">1M+ Users</span>
+<span class="px-4 py-2 bg-tertiary-fixed text-on-tertiary-fixed rounded-full font-label text-sm shadow-lg font-bold">Live Tournaments</span>
+</div>
+</div>
+</div>
+</div>
+
+
+</body></html>

@@ -167,19 +167,20 @@ const NearbyFriends = () => {
     const layer = markersLayer.current;
     const hasLocation = latitude != null && longitude != null;
 
-    if (hasLocation) {
+    const allPoints = [];
+    const selfLatLng = hasLocation ? L.latLng(latitude, longitude) : null;
+
+    if (selfLatLng) {
       const selfIcon = L.divIcon({
         className: '',
         html: '<div class="nf-user-marker self">S</div>',
         iconSize: [40, 40],
         iconAnchor: [20, 20],
       });
-
-      L.marker([latitude, longitude], { icon: selfIcon })
+      L.marker(selfLatLng, { icon: selfIcon })
         .addTo(layer)
         .bindPopup('<div class="nf-marker-popup"><strong>You</strong></div>');
-
-      map.setView([latitude, longitude], 13);
+      allPoints.push(selfLatLng);
     }
 
     nearbyUsers.forEach((u) => {
@@ -188,32 +189,26 @@ const NearbyFriends = () => {
       if (lat == null || lng == null) return;
 
       const initial = (u.displayName || 'U')[0].toUpperCase();
-      const cls = u.online ? 'nf-user-marker online' : 'nf-user-marker';
+      const markerCls = u.online ? 'nf-user-marker online' : 'nf-user-marker';
       const icon = L.divIcon({
         className: '',
-        html: `<div class="${cls}">${initial}</div>`,
+        html: `<div class="${markerCls}">${initial}</div>`,
         iconSize: [36, 36],
         iconAnchor: [18, 18],
       });
 
-      L.marker([lat, lng], { icon }).addTo(layer)
-        .bindPopup(
-          `<div class="nf-marker-popup"><strong>${u.displayName}</strong>${u.distance != null ? `<br/><span>${formatDistance(u.distance)} away</span>` : ''}<br/><a href="/profile/${u.uid}">View Profile</a></div>`
-        );
-    });
+      const popupHtml = `<div class="nf-marker-popup"><strong>${u.displayName}</strong>${u.distance != null ? `<br/><span>${formatDistance(u.distance)} away</span>` : ''}<br/><a href="/profile/${u.uid}">View Profile</a></div>`;
 
-    const points = [];
-    if (hasLocation) points.push(L.latLng(latitude, longitude));
-    nearbyUsers.forEach((u) => {
-      const lat = u.lat ?? u.location?.lat;
-      const lng = u.lng ?? u.location?.lng;
-      if (lat != null && lng != null) points.push(L.latLng(lat, lng));
+      L.marker([lat, lng], { icon }).addTo(layer).bindPopup(popupHtml);
+      allPoints.push(L.latLng(lat, lng));
     });
 
     setTimeout(() => { if (mapInstance.current) mapInstance.current.invalidateSize(); }, 100);
 
-    if (points.length > 1) {
-      map.fitBounds(points, { padding: [50, 50], maxZoom: 15 });
+    if (allPoints.length > 1) {
+      map.fitBounds(allPoints, { padding: [50, 50], maxZoom: 15 });
+    } else if (selfLatLng) {
+      map.setView(selfLatLng, 13);
     }
   }, [nearbyUsers, latitude, longitude, mapInit]);
 
