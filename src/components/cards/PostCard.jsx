@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { timeAgo } from '../../utils/timestampUtils';
 import { truncateText, formatNumber, linkifyText } from '../../utils/formatUtils';
@@ -19,6 +19,7 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
   const pickerRef = useRef(null);
   const menuRef = useRef(null);
   const longPressTimer = useRef(null);
+  const [reactionDeltas, setReactionDeltas] = useState({});
 
   const closeReactionPicker = useCallback(() => {
     setShowReactions(false);
@@ -50,7 +51,24 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
     image,
   } = post;
 
-  const totalReactions = Object.values(postReactions).reduce((a, b) => a + b, 0);
+  const displayReactions = useMemo(() => {
+    const merged = { ...postReactions };
+    Object.entries(reactionDeltas).forEach(([emoji, delta]) => {
+      merged[emoji] = Math.max(0, (merged[emoji] || 0) + delta);
+    });
+    return merged;
+  }, [postReactions, reactionDeltas]);
+
+  useEffect(() => {
+    if (Object.keys(reactionDeltas).length === 0) return;
+    const synced = Object.entries(reactionDeltas).every(([emoji, delta]) => {
+      if (delta === 0) return true;
+      return delta > 0 ? (postReactions[emoji] || 0) >= delta : (postReactions[emoji] || 0) === 0;
+    });
+    if (synced) setReactionDeltas({});
+  }, [postReactions, reactionDeltas]);
+
+  const totalReactions = Object.values(displayReactions).reduce((a, b) => a + b, 0);
   const comments = localComments || [];
   const isAuthor = currentUserId && currentUserId === authorId;
 
@@ -130,6 +148,10 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
     e.stopPropagation();
     const isReacted = hasReacted(id, emoji);
     toggleReaction(id, emoji);
+    setReactionDeltas(prev => ({
+      ...prev,
+      [emoji]: (prev[emoji] || 0) + (isReacted ? -1 : 1),
+    }));
     if (isReacted) {
       onReact?.(id, emoji, authorId, true);
     } else {
@@ -183,7 +205,7 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
       )}
 
       <div className="pc-reactions-bar">
-        {REACTION_EMOJIS.filter((e) => (postReactions[e] || 0) > 0 || REACTION_EMOJIS.slice(0, 3).includes(e)).map((emoji) => (
+        {REACTION_EMOJIS.filter((e) => (displayReactions[e] || 0) > 0 || REACTION_EMOJIS.slice(0, 3).includes(e)).map((emoji) => (
           <button
             key={emoji}
             onClick={(e) => handleReactClick(e, emoji)}
@@ -192,7 +214,7 @@ const PostCard = ({ post, localComments, onReact, onComment, onAddComment, onDel
             style={hasReacted(id, emoji) ? { background: 'rgba(123,77,255,0.15)', borderColor: 'rgba(123,77,255,0.35)' } : {}}
           >
             <span className="pc-reaction-emoji">{emoji}</span>
-            <span className="pc-reaction-count">{formatNumber(postReactions[emoji] || 0)}</span>
+            <span className="pc-reaction-count">{formatNumber(displayReactions[emoji] || 0)}</span>
           </button>
         ))}
         <button onClick={(e) => { e.stopPropagation(); onComment?.(id); }} className="pc-reaction-btn pc-reaction-btn--right" aria-label="View post detail">
