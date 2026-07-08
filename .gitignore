@@ -25,3 +25,5 @@ dist-ssr
 
 .vercel
 google-services.json
+
+.env.vercel
