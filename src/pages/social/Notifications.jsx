@@ -83,11 +83,17 @@ const Notifications = () => {
 
   const handleMarkRead = async (id) => {
     const notif = notifications.find((n) => n.id === id);
-    if (notif?._dummy) return;
+    if (!notif) return;
+    if (notif._dummy) {
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+      return;
+    }
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
     try { await markNotificationRead(id); } catch {}
   };
 
   const handleMarkAllRead = async () => {
+    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     try { await markAllNotificationsRead(user?.uid); } catch {}
   };
 
@@ -146,9 +152,6 @@ const Notifications = () => {
               <span className="notif-time">
                 {formatTime(n.createdAt)}
               </span>
-            </div>
-            <div className="notif-icon">
-              {iconMap[n.type]}
             </div>
           </div>
         ))

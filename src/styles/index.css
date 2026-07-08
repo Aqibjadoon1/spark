@@ -725,15 +725,18 @@ body {
 .feed-filters {
   display: flex;
   gap: 12px;
+  width: 100%;
 }
 
 .feed-filters select,
 .feed-filters .select-input {
   flex: 1;
+  min-width: 0;
 }
 
 .feed-select {
   flex: 1;
+  min-width: 0;
   height: 48px;
   padding: 0 36px 0 16px;
   border-radius: var(--radius-md);
@@ -1410,6 +1413,9 @@ body {
 .post-action-btn.active { color: var(--color-primary-light); }
 .post-action-btn svg,
 .pc-action-btn svg { width: 16px; height: 16px; }
+
+/* ====== POST DETAIL ====== */
+.pd-container { width: 100%; }
 
 /* ====== POST DETAIL COMMENTS ====== */
 .post-comments-section { margin-top: 32px; }

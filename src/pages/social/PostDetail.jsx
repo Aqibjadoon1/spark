@@ -189,7 +189,7 @@ const PostDetail = () => {
 
   if (pageLoading || loading) {
     return (
-      <div style={{ maxWidth: 640, margin: '0 auto' }}>
+      <div className="pd-container">
         <Skeleton variant="post" count={1} />
         <div style={{ marginTop: 32 }}>
           <Skeleton variant="text" count={3} />
@@ -200,7 +200,7 @@ const PostDetail = () => {
 
   if (error && !post) {
     return (
-      <div style={{ maxWidth: 640, margin: '0 auto' }}>
+      <div className="pd-container">
         <EmptyState
           icon={
             <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ margin: '0 auto' }}>
@@ -218,7 +218,7 @@ const PostDetail = () => {
 
   if (!post) {
     return (
-      <div style={{ maxWidth: 640, margin: '0 auto' }}>
+      <div className="pd-container">
         <EmptyState
           icon={
             <svg className="w-16 h-16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ margin: '0 auto' }}>
@@ -238,7 +238,7 @@ const PostDetail = () => {
   const reactionEmojis = ['❤️', '🔥', '👍'];
 
   return (
-    <div style={{ maxWidth: 640, margin: '0 auto' }}>
+    <div className="pd-container">
       <button
         onClick={() => navigate(-1)}
         className="btn btn-ghost btn-sm"
